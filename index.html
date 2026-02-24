@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📘 NETstar URL Notes</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f0f4ff;
+      --surface: #ffffff;
+      --surface2: #e8eeff;
+      --border: #d0d9ff;
+      --text: #1a1f3a;
+      --text-muted: #5a6080;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --accent2: #0ea5e9;
+      --shadow: 0 4px 24px rgba(37,99,235,0.10);
+      --shadow-hover: 0 8px 32px rgba(37,99,235,0.18);
+      --card-radius: 16px;
+      --transition: 0.22s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="dark"] {
+      --bg: #0d1117;
+      --surface: #161b27;
+      --surface2: #1e2537;
+      --border: #2a3555;
+      --text: #e6eaf7;
+      --text-muted: #8b96b8;
+      --accent: #3b82f6;
+      --accent-soft: #1e3a5f;
+      --accent2: #38bdf8;
+      --shadow: 0 4px 24px rgba(0,0,0,0.35);
+      --shadow-hover: 0 8px 32px rgba(59,130,246,0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #2563eb, #6366f1);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 2px 12px rgba(37,99,235,0.3);
+    }
+    .header-title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; }
+    .header-title span { color: var(--accent); }
+    .header-sub { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.04em; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .badge {
+      background: var(--accent-soft); color: var(--accent);
+      font-size: 0.7rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 0.04em;
+    }
+    .theme-btn {
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 10px; width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 18px;
+      transition: all var(--transition); color: var(--text);
+    }
+    .theme-btn:hover { background: var(--accent-soft); border-color: var(--accent); transform: rotate(20deg) scale(1.1); }
+    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    .section-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.2rem; margin-bottom: 2.5rem; }
+    .card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--card-radius); padding: 1.4rem 1.5rem;
+      box-shadow: var(--shadow); transition: all var(--transition);
+      position: relative; overflow: hidden; cursor: pointer;
+      text-decoration: none; color: var(--text); display: block;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: var(--card-accent, var(--accent));
+      border-radius: 16px 0 0 16px; transition: width var(--transition);
+    }
+    .card:hover { box-shadow: var(--shadow-hover); border-color: var(--card-accent, var(--accent)); transform: translateY(-3px); }
+    .card:hover::before { width: 6px; }
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 1rem;
+      background: var(--card-icon-bg, var(--accent-soft));
+    }
+    .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
+    .card-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.9rem; }
+    .card-url {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+      color: var(--accent2); background: var(--surface2);
+      padding: 5px 10px; border-radius: 7px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+    }
+    .card-credentials { margin-top: 0.8rem; padding: 0.7rem 0.9rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; }
+    .cred-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+    .cred-label { color: var(--text-muted); min-width: 48px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .cred-value { color: var(--text); font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cred-copy { background: none; border: none; cursor: pointer; font-size: 13px; padding: 2px 5px; border-radius: 5px; color: var(--text-muted); transition: all 0.15s; }
+    .cred-copy:hover { background: var(--accent-soft); color: var(--accent); }
+    .arrow { position: absolute; top: 1.4rem; right: 1.4rem; font-size: 16px; color: var(--text-muted); transition: all var(--transition); }
+    .card:hover .arrow { color: var(--card-accent, var(--accent)); transform: translate(2px,-2px); }
+    footer { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.75rem; border-top: 1px solid var(--border); }
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--accent); color: white;
+      padding: 10px 20px; border-radius: 10px;
+      font-size: 0.8rem; font-weight: 600;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(.4,0,.2,1); z-index: 999;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    @media (max-width: 600px) { header { padding: 0 1rem; } main { padding: 1.5rem 1rem; } .badge { display: none; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo-icon">📘</div>
+    <div>
+      <div class="header-title"><span>NET</span>star Notes</div>
+      <div class="header-sub">URL Reference Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge">6 Links</span>
+    <button class="theme-btn" id="themeToggle" title="Toggle dark/light mode">🌙</button>
+  </div>
+</header>
+
+<main>
+
+  <div class="section-label">📋 Documentation &amp; Issues</div>
+  <div class="grid">
+
+    <a href="https://docs.google.com/document/d/1JQwRrvTIApjQirSPqxnar35_L8v-RXowZLDPIwXlJqc/edit?tab=t.0" target="_blank" class="card" style="--card-accent:#f59e0b;--card-icon-bg:#fef3c7;">
+      <span class="arrow">↗</span>
+      <div class="card-icon">📄</div>
+      <div class="card-title">Internal Issue — Jira Ticket</div>
+      <div class="card-desc">Google Doc for internal issues linked with Jira tickets. Reference for tracking and documentation.</div>
+      <span class="card-url">docs.google.com/document/d/1JQwRrv...</span>
+    </a>
+
+    <a href="https://netstar.atlassian.net/jira/core/projects/SS/board?groupBy=status&filter=" target="_blank" class="card" style="--card-accent:#3b82f6;--card-icon-bg:#dbeafe;">
+      <span class="arrow">↗</span>
+      <div class="card-icon">🎯</div>
+      <div class="card-title">Jira Board — NETstar SS</div>
+      <div class="card-desc">Project board for SS tasks grouped by status. Track progress and filter issues.</div>
+      <span class="card-url">netstar.atlassian.net/jira/core/...</span>
+      <div class="card-credentials" onclick="event.preventDefault(); event.stopPropagation();">
+        <div class="cred-row">
+          <span class="cred-label">User</span>
+          <span class="cred-value">ns-jira-cebu@cebutele-net.com</span>
+          <button class="cred-copy" onclick="copyText('ns-jira-cebu@cebutele-net.com', this)">📋</button>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Pass</span>
+          <span class="cred-value">tele7222</span>
+          <button class="cred-copy" onclick="copyText('tele7222', this)">📋</button>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="section-label">🛠 Tools &amp; Portals</div>
+  <div class="grid">
+
+    <a href="https://inquiry-ns.vercel.app/" target="_blank" class="card" style="--card-accent:#10b981;--card-icon-bg:#d1fae5;">
+      <span class="arrow">↗</span>
+      <div class="card-icon">🔍</div>
+      <div class="card-title">Inquiry Notes</div>
+      <div class="card-desc">Internal inquiry management and notes tracker for NETstar operations.</div>
+      <span class="card-url">inquiry-ns.vercel.app</span>
+    </a>
+
+    <a href="https://template-red-three.vercel.app/" target="_blank" class="card" style="--card-accent:#ef4444;--card-icon-bg:#fee2e2;">
+      <span class="arrow">↗</span>
+      <div class="card-icon">🤝</div>
+      <div class="card-title">Partner Portal</div>
+      <div class="card-desc">Portal for managing partner-related templates and communications.</div>
+      <span class="card-url">template-red-three.vercel.app</span>
+    </a>
+
+    <a href="https://cut-new.vercel.app/" target="_blank" class="card" style="--card-accent:#8b5cf6;--card-icon-bg:#ede9fe;">
+      <span class="arrow">↗</span>
+      <div class="card-icon">✂️</div>
+      <div class="card-title">URL Cutter Tools</div>
+      <div class="card-desc">Utility for shortening and cutting long URLs for quick sharing.</div>
+      <span class="card-url">cut-new.vercel.app</span>
+    </a>
+
+    <a href="https://category-phi.vercel.app/" target="_blank" class="card" style="--card-accent:#0ea5e9;--card-icon-bg:#e0f2fe;">
+      <span class="arrow">↗</span>
+      <div class="card-icon">🗂️</div>
+      <div class="card-title">Category Management Search</div>
+      <div class="card-desc">Search and manage category entries efficiently for NETstar classification.</div>
+      <span class="card-url">category-phi.vercel.app</span>
+    </a>
+
+    <a href="https://vender-ashen.vercel.app/" target="_blank" class="card" style="--card-accent:#f43f5e;--card-icon-bg:#ffe4e6;">
+      <span class="arrow">↗</span>
+      <div class="card-icon">🔒</div>
+      <div class="card-title">Security Checker</div>
+      <div class="card-desc">Vendor/security verification tool for checking and validating security status.</div>
+      <span class="card-url">vender-ashen.vercel.app</span>
+    </a>
+
+  </div>
+
+</main>
+
+<footer>
+  📘 NETstar URL Notes &nbsp;·&nbsp; Internal Use Only &nbsp;·&nbsp; 2025
+</footer>
+
+<div class="toast" id="toast">✅ Copied to clipboard!</div>
+
+<script>
+  const html = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const toast = document.getElementById('toast');
+  let toastTimer;
+
+  const saved = localStorage.getItem('ns-theme') || 'light';
+  setTheme(saved);
+
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    localStorage.setItem('ns-theme', next);
+  });
+
+  function setTheme(t) {
+    html.setAttribute('data-theme', t);
+    btn.textContent = t === 'light' ? '🌙' : '☀️';
+  }
+
+  function copyText(text, el) {
+    navigator.clipboard.writeText(text).then(() => {
+      el.textContent = '✅';
+      setTimeout(() => el.textContent = '📋', 1500);
+      clearTimeout(toastTimer);
+      toast.classList.add('show');
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+  }
+</script>
+</body>
+</html>
