@@ -15,26 +15,6 @@
           fontFamily: {
             sans: ['Plus Jakarta Sans', 'sans-serif'],
             mono: ['Fira Code', 'monospace'],
-          },
-          colors: {
-            brand: {
-              50:  '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              900: '#1e1b4b',
-            }
-          },
-          animation: {
-            'fade-up': 'fadeUp 0.5s ease both',
-            'slide-in': 'slideIn 0.3s ease both',
-          },
-          keyframes: {
-            fadeUp: { '0%': { opacity: '0', transform: 'translateY(16px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-            slideIn: { '0%': { opacity: '0', transform: 'translateX(20px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
           }
         }
       }
@@ -42,247 +22,277 @@
   </script>
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .card-glow:hover { box-shadow: 0 0 0 1px var(--glow), 0 8px 32px -4px var(--glow-soft); }
-    .card-bar::before {
-      content: ''; position: absolute; top: 0; left: 0;
-      width: 100%; height: 3px;
-      background: var(--bar-color, #6366f1);
-      border-radius: 12px 12px 0 0;
-      opacity: 0; transition: opacity 0.2s;
-    }
-    .card-bar:hover::before { opacity: 1; }
-    .grid-stagger > *:nth-child(1) { animation-delay: 0.05s; }
-    .grid-stagger > *:nth-child(2) { animation-delay: 0.10s; }
-    .grid-stagger > *:nth-child(3) { animation-delay: 0.15s; }
-    .grid-stagger > *:nth-child(4) { animation-delay: 0.20s; }
-    .grid-stagger > *:nth-child(5) { animation-delay: 0.25s; }
-    .grid-stagger > *:nth-child(6) { animation-delay: 0.30s; }
-    .grid-stagger > *:nth-child(7) { animation-delay: 0.35s; }
-    .noise-bg::after {
-      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      opacity: 0.5;
-    }
-    .dot-grid {
-      background-image: radial-gradient(circle, rgba(99,102,241,0.15) 1px, transparent 1px);
-      background-size: 24px 24px;
-    }
-    .dark .dot-grid {
-      background-image: radial-gradient(circle, rgba(129,140,248,0.12) 1px, transparent 1px);
-    }
-    .section-divider {
-      display: flex; align-items: center; gap: 12px;
-      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-    }
-    .section-divider::after { content: ''; flex: 1; height: 1px; }
-    .toast-enter { animation: slideIn 0.3s ease; }
-    .kbd {
-      display: inline-flex; align-items: center; justify-content: center;
-      background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
-      border-radius: 5px; padding: 1px 6px; font-size: 0.65rem; font-family: 'Fira Code', monospace;
-    }
-    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.25); border-radius: 99px; }
+    .dot-bg {
+      background-image: radial-gradient(circle, rgba(99,102,241,0.12) 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+    .dark .dot-bg {
+      background-image: radial-gradient(circle, rgba(129,140,248,0.08) 1px, transparent 1px);
+    }
+    tr.row-link { cursor: pointer; }
+    tr.row-link:hover td { background-color: rgba(99,102,241,0.04); }
+    .dark tr.row-link:hover td { background-color: rgba(99,102,241,0.07); }
+    tr.row-link td:first-child { border-left: 3px solid transparent; transition: border-color 0.15s, background 0.15s; }
+    tr.row-link:hover td:first-child { border-left-color: var(--row-accent, #6366f1); }
+    .fade-in { animation: fadeIn 0.4s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    tbody tr:nth-child(1) { animation-delay: 0.04s; }
+    tbody tr:nth-child(2) { animation-delay: 0.08s; }
+    tbody tr:nth-child(3) { animation-delay: 0.12s; }
+    tbody tr:nth-child(4) { animation-delay: 0.16s; }
+    tbody tr:nth-child(5) { animation-delay: 0.20s; }
+    tbody tr:nth-child(6) { animation-delay: 0.24s; }
+    tbody tr:nth-child(7) { animation-delay: 0.28s; }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#080c14] text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300 noise-bg">
+<body class="bg-slate-50 dark:bg-[#080c14] text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300">
 
-<!-- Background dot grid -->
-<div class="fixed inset-0 dot-grid pointer-events-none z-0 opacity-60"></div>
+<div class="fixed inset-0 dot-bg pointer-events-none z-0 opacity-60"></div>
 
 <!-- Header -->
-<header class="relative z-50 sticky top-0 bg-white/80 dark:bg-[#0d1220]/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 shadow-sm shadow-brand-500/5">
-  <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+<header class="relative z-50 sticky top-0 bg-white/85 dark:bg-[#0c1018]/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80">
+  <div class="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-400 flex items-center justify-center text-lg shadow-lg shadow-brand-500/30 select-none">📘</div>
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-400 flex items-center justify-center text-sm shadow-md shadow-indigo-500/30 select-none">📘</div>
       <div>
-        <div class="font-extrabold text-base tracking-tight leading-none">
-          <span class="text-brand-500">NET</span>star <span class="text-slate-400 dark:text-slate-500 font-medium text-sm">Notes</span>
+        <div class="font-extrabold text-sm tracking-tight leading-tight">
+          <span class="text-indigo-500">NET</span>star <span class="text-slate-400 dark:text-slate-500 font-medium">Notes</span>
         </div>
-        <div class="text-[0.62rem] text-slate-400 dark:text-slate-500 tracking-widest uppercase font-medium mt-0.5">URL Reference Dashboard</div>
+        <div class="text-[0.58rem] text-slate-400 dark:text-slate-600 tracking-widest uppercase font-semibold">URL Reference Dashboard</div>
       </div>
     </div>
-    <div class="flex items-center gap-2.5">
-      <span class="hidden sm:flex items-center gap-1.5 text-[0.68rem] font-semibold tracking-wide bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 px-3 py-1.5 rounded-full border border-brand-100 dark:border-brand-800/60">
+    <div class="flex items-center gap-2">
+      <span class="hidden sm:flex items-center gap-1.5 text-[0.65rem] font-bold tracking-wide bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-full border border-indigo-100 dark:border-indigo-900/60">
         <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
         7 Links
       </span>
-      <button id="themeToggle" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-base hover:bg-brand-50 dark:hover:bg-brand-900/40 hover:border-brand-300 dark:hover:border-brand-700 transition-all duration-200 hover:scale-105 active:scale-95">
+      <button id="themeToggle" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-sm hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200 hover:scale-105 active:scale-95">
         <span id="themeIcon">🌙</span>
       </button>
     </div>
   </div>
 </header>
 
-<main class="relative z-10 max-w-6xl mx-auto px-5 py-10">
+<main class="relative z-10 max-w-5xl mx-auto px-6 py-8 space-y-8">
 
-  <!-- Docs & Issues Section -->
-  <div class="section-divider text-slate-400 dark:text-slate-600 mb-6 after:bg-slate-200 dark:after:bg-slate-800">
-    <span class="text-brand-500">📋</span>
-    Documentation &amp; Issues
-  </div>
+  <!-- Section: Documentation & Issues -->
+  <section>
+    <div class="flex items-center gap-2 mb-3">
+      <span class="text-[0.65rem] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-600">📋 Documentation &amp; Issues</span>
+      <div class="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+    </div>
+    <div class="bg-white dark:bg-[#111520] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40">
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 w-10"></th>
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Name</th>
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 hidden md:table-cell">Description</th>
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">URL</th>
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 hidden lg:table-cell">Credentials</th>
+              <th class="w-8"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-link fade-in border-b border-slate-100 dark:border-slate-800/60"
+                style="--row-accent:#f59e0b"
+                onclick="window.open('https://docs.google.com/document/d/1JQwRrvTIApjQirSPqxnar35_L8v-RXowZLDPIwXlJqc/edit?tab=t.0','_blank')">
+              <td class="px-4 py-3.5">
+                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 flex items-center justify-center">📄</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs leading-snug">Internal Issue</div>
+                <div class="text-[0.6rem] text-slate-400 mt-0.5">Jira Ticket Doc</div>
+              </td>
+              <td class="px-4 py-3.5 hidden md:table-cell text-xs text-slate-500 dark:text-slate-500 max-w-xs">Google Doc for internal issues linked with Jira tickets.</td>
+              <td class="px-4 py-3.5">
+                <span class="font-mono text-[0.6rem] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-md border border-amber-100 dark:border-amber-800/30 whitespace-nowrap">docs.google.com/...</span>
+              </td>
+              <td class="px-4 py-3.5 hidden lg:table-cell text-xs text-slate-400 dark:text-slate-700 italic">No credentials</td>
+              <td class="pr-4 text-slate-300 dark:text-slate-700 text-xs text-right">↗</td>
+            </tr>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10 grid-stagger">
+            <tr class="row-link fade-in"
+                style="--row-accent:#3b82f6"
+                onclick="window.open('https://netstar.atlassian.net/jira/core/projects/SS/board?groupBy=status&filter=','_blank')">
+              <td class="px-4 py-3.5">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 flex items-center justify-center">🎯</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs leading-snug">Jira Board</div>
+                <div class="text-[0.6rem] text-slate-400 mt-0.5">NETstar SS</div>
+              </td>
+              <td class="px-4 py-3.5 hidden md:table-cell text-xs text-slate-500 dark:text-slate-500 max-w-xs">Project board for SS tasks grouped by status.</td>
+              <td class="px-4 py-3.5">
+                <span class="font-mono text-[0.6rem] text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-md border border-blue-100 dark:border-blue-800/30 whitespace-nowrap">netstar.atlassian.net/...</span>
+              </td>
+              <td class="px-4 py-3.5 hidden lg:table-cell" onclick="event.stopPropagation()">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-1.5 font-mono text-[0.6rem]">
+                    <span class="text-slate-400 w-6 shrink-0">usr</span>
+                    <span class="text-slate-600 dark:text-slate-400 truncate max-w-[150px]">ns-jira-cebu@cebutele-net.com</span>
+                    <button onclick="copyText('ns-jira-cebu@cebutele-net.com', this)" class="shrink-0 text-slate-400 hover:text-blue-500 transition-colors px-1 py-0.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30 text-xs">📋</button>
+                  </div>
+                  <div class="flex items-center gap-1.5 font-mono text-[0.6rem]">
+                    <span class="text-slate-400 w-6 shrink-0">pw</span>
+                    <span class="text-slate-600 dark:text-slate-400">tele7222</span>
+                    <button onclick="copyText('tele7222', this)" class="shrink-0 text-slate-400 hover:text-blue-500 transition-colors px-1 py-0.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30 text-xs">📋</button>
+                  </div>
+                </div>
+              </td>
+              <td class="pr-4 text-slate-300 dark:text-slate-700 text-xs text-right">↗</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
-    <!-- Jira Google Doc -->
-    <a href="https://docs.google.com/document/d/1JQwRrvTIApjQirSPqxnar35_L8v-RXowZLDPIwXlJqc/edit?tab=t.0" target="_blank"
-       class="card-bar card-glow relative bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline text-inherit animate-fade-up"
-       style="--bar-color:#f59e0b; --glow:rgba(245,158,11,0.4); --glow-soft:rgba(245,158,11,0.12)">
-      <div class="flex items-start justify-between">
-        <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/40 flex items-center justify-center text-xl">📄</div>
-        <span class="text-slate-300 dark:text-slate-600 text-sm font-light group-hover:text-amber-400 transition-colors">↗</span>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-1 text-slate-800 dark:text-slate-100">Internal Issue — Jira Ticket</div>
-        <div class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Google Doc for internal issues linked with Jira tickets. Reference for tracking and documentation.</div>
-      </div>
-      <span class="font-mono text-[0.65rem] text-amber-500 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1.5 rounded-lg border border-amber-100 dark:border-amber-800/30 truncate block">docs.google.com/document/d/1JQwRrv...</span>
-    </a>
+  <!-- Section: Tools & Portals -->
+  <section>
+    <div class="flex items-center gap-2 mb-3">
+      <span class="text-[0.65rem] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-600">🛠 Tools &amp; Portals</span>
+      <div class="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+    </div>
+    <div class="bg-white dark:bg-[#111520] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40">
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 w-10"></th>
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Name</th>
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 hidden md:table-cell">Description</th>
+              <th class="text-left px-4 py-2.5 text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">URL</th>
+              <th class="w-8"></th>
+            </tr>
+          </thead>
+          <tbody>
 
-    <!-- Jira Board -->
-    <a href="https://netstar.atlassian.net/jira/core/projects/SS/board?groupBy=status&filter=" target="_blank"
-       class="card-bar card-glow relative bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline text-inherit animate-fade-up"
-       style="--bar-color:#3b82f6; --glow:rgba(59,130,246,0.4); --glow-soft:rgba(59,130,246,0.12)">
-      <div class="flex items-start justify-between">
-        <div class="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 flex items-center justify-center text-xl">🎯</div>
-        <span class="text-slate-300 dark:text-slate-600 text-sm">↗</span>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-1 text-slate-800 dark:text-slate-100">Jira Board — NETstar SS</div>
-        <div class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Project board for SS tasks grouped by status. Track progress and filter issues.</div>
-      </div>
-      <span class="font-mono text-[0.65rem] text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg border border-blue-100 dark:border-blue-800/30 truncate block">netstar.atlassian.net/jira/core/...</span>
-      <!-- Credentials -->
-      <div onclick="event.preventDefault(); event.stopPropagation();" class="bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3 font-mono text-xs space-y-1.5">
-        <div class="flex items-center gap-2">
-          <span class="text-[0.6rem] uppercase tracking-widest text-slate-400 w-10 shrink-0">User</span>
-          <span class="text-slate-700 dark:text-slate-300 flex-1 truncate text-[0.68rem]">ns-jira-cebu@cebutele-net.com</span>
-          <button onclick="copyText('ns-jira-cebu@cebutele-net.com', this)" class="text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg p-1 transition-all text-xs leading-none">📋</button>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-[0.6rem] uppercase tracking-widest text-slate-400 w-10 shrink-0">Pass</span>
-          <span class="text-slate-700 dark:text-slate-300 flex-1 text-[0.68rem]">tele7222</span>
-          <button onclick="copyText('tele7222', this)" class="text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg p-1 transition-all text-xs leading-none">📋</button>
-        </div>
-      </div>
-    </a>
+            <tr class="row-link fade-in border-b border-slate-100 dark:border-slate-800/60"
+                style="--row-accent:#10b981"
+                onclick="window.open('https://inquiry-ns.vercel.app/','_blank')">
+              <td class="px-4 py-3.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 flex items-center justify-center">🔍</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs">Inquiry Notes</div>
+                <div class="text-[0.6rem] text-slate-400 mt-0.5">Operations tracker</div>
+              </td>
+              <td class="px-4 py-3.5 hidden md:table-cell text-xs text-slate-500 dark:text-slate-500 max-w-xs">Internal inquiry management and notes tracker for NETstar operations.</td>
+              <td class="px-4 py-3.5">
+                <span class="font-mono text-[0.6rem] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-md border border-emerald-100 dark:border-emerald-800/30 whitespace-nowrap">inquiry-ns.vercel.app</span>
+              </td>
+              <td class="pr-4 text-slate-300 dark:text-slate-700 text-xs text-right">↗</td>
+            </tr>
 
-  </div>
+            <tr class="row-link fade-in border-b border-slate-100 dark:border-slate-800/60"
+                style="--row-accent:#06b6d4"
+                onclick="window.open('https://inquirynotes.vercel.app/','_blank')">
+              <td class="px-4 py-3.5">
+                <div class="w-8 h-8 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800/30 flex items-center justify-center">📝</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-semibold text-slate-800 dark:text-slate-100 text-xs">Inquiry Notes v2</span>
+                  <span class="text-[0.52rem] font-bold uppercase tracking-wider bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded-full border border-cyan-200 dark:border-cyan-700/40">New</span>
+                </div>
+                <div class="text-[0.6rem] text-slate-400 mt-0.5">Updated platform</div>
+              </td>
+              <td class="px-4 py-3.5 hidden md:table-cell text-xs text-slate-500 dark:text-slate-500 max-w-xs">Updated inquiry notes platform. Manage and review inquiry records.</td>
+              <td class="px-4 py-3.5">
+                <span class="font-mono text-[0.6rem] text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/20 px-2 py-1 rounded-md border border-cyan-100 dark:border-cyan-800/30 whitespace-nowrap">inquirynotes.vercel.app</span>
+              </td>
+              <td class="pr-4 text-slate-300 dark:text-slate-700 text-xs text-right">↗</td>
+            </tr>
 
-  <!-- Tools & Portals Section -->
-  <div class="section-divider text-slate-400 dark:text-slate-600 mb-6 after:bg-slate-200 dark:after:bg-slate-800">
-    <span class="text-brand-500">🛠</span>
-    Tools &amp; Portals
-  </div>
+            <tr class="row-link fade-in border-b border-slate-100 dark:border-slate-800/60"
+                style="--row-accent:#ef4444"
+                onclick="window.open('https://template-red-three.vercel.app/','_blank')">
+              <td class="px-4 py-3.5">
+                <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 flex items-center justify-center">🤝</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs">Partner Portal</div>
+                <div class="text-[0.6rem] text-slate-400 mt-0.5">Templates &amp; comms</div>
+              </td>
+              <td class="px-4 py-3.5 hidden md:table-cell text-xs text-slate-500 dark:text-slate-500 max-w-xs">Portal for managing partner-related templates and communications.</td>
+              <td class="px-4 py-3.5">
+                <span class="font-mono text-[0.6rem] text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-md border border-red-100 dark:border-red-800/30 whitespace-nowrap">template-red-three.vercel.app</span>
+              </td>
+              <td class="pr-4 text-slate-300 dark:text-slate-700 text-xs text-right">↗</td>
+            </tr>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 grid-stagger">
+            <tr class="row-link fade-in border-b border-slate-100 dark:border-slate-800/60"
+                style="--row-accent:#8b5cf6"
+                onclick="window.open('https://cut-new.vercel.app/','_blank')">
+              <td class="px-4 py-3.5">
+                <div class="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-900/20 border border-violet-100 dark:border-violet-800/30 flex items-center justify-center">✂️</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs">URL Cutter Tools</div>
+                <div class="text-[0.6rem] text-slate-400 mt-0.5">URL shortener</div>
+              </td>
+              <td class="px-4 py-3.5 hidden md:table-cell text-xs text-slate-500 dark:text-slate-500 max-w-xs">Utility for shortening and cutting long URLs for quick sharing.</td>
+              <td class="px-4 py-3.5">
+                <span class="font-mono text-[0.6rem] text-violet-500 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded-md border border-violet-100 dark:border-violet-800/30 whitespace-nowrap">cut-new.vercel.app</span>
+              </td>
+              <td class="pr-4 text-slate-300 dark:text-slate-700 text-xs text-right">↗</td>
+            </tr>
 
-    <!-- Inquiry Notes -->
-    <a href="https://inquiry-ns.vercel.app/" target="_blank"
-       class="card-bar card-glow relative bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline text-inherit animate-fade-up"
-       style="--bar-color:#10b981; --glow:rgba(16,185,129,0.4); --glow-soft:rgba(16,185,129,0.12)">
-      <div class="flex items-start justify-between">
-        <div class="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center text-xl">🔍</div>
-        <span class="text-slate-300 dark:text-slate-600 text-sm">↗</span>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-1 text-slate-800 dark:text-slate-100">Inquiry Notes</div>
-        <div class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Internal inquiry management and notes tracker for NETstar operations.</div>
-      </div>
-      <span class="font-mono text-[0.65rem] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2.5 py-1.5 rounded-lg border border-emerald-100 dark:border-emerald-800/30 truncate block">inquiry-ns.vercel.app</span>
-    </a>
+            <tr class="row-link fade-in border-b border-slate-100 dark:border-slate-800/60"
+                style="--row-accent:#0ea5e9"
+                onclick="window.open('https://category-phi.vercel.app/','_blank')">
+              <td class="px-4 py-3.5">
+                <div class="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/30 flex items-center justify-center">🗂️</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs">Category Management</div>
+                <div class="text-[0.6rem] text-slate-400 mt-0.5">Search &amp; classify</div>
+              </td>
+              <td class="px-4 py-3.5 hidden md:table-cell text-xs text-slate-500 dark:text-slate-500 max-w-xs">Search and manage category entries for NETstar classification.</td>
+              <td class="px-4 py-3.5">
+                <span class="font-mono text-[0.6rem] text-sky-500 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2 py-1 rounded-md border border-sky-100 dark:border-sky-800/30 whitespace-nowrap">category-phi.vercel.app</span>
+              </td>
+              <td class="pr-4 text-slate-300 dark:text-slate-700 text-xs text-right">↗</td>
+            </tr>
 
-    <!-- NEW: Inquiry Notes v2 -->
-    <a href="https://inquirynotes.vercel.app/" target="_blank"
-       class="card-bar card-glow relative bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline text-inherit animate-fade-up"
-       style="--bar-color:#06b6d4; --glow:rgba(6,182,212,0.4); --glow-soft:rgba(6,182,212,0.12)">
-      <div class="flex items-start justify-between">
-        <div class="w-11 h-11 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800/40 flex items-center justify-center text-xl">📝</div>
-        <div class="flex items-center gap-1.5">
-          <span class="text-[0.6rem] font-bold uppercase tracking-widest bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-400 px-2 py-0.5 rounded-full border border-cyan-200 dark:border-cyan-700/50">New</span>
-          <span class="text-slate-300 dark:text-slate-600 text-sm">↗</span>
-        </div>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-1 text-slate-800 dark:text-slate-100">Inquiry Notes <span class="text-cyan-500">v2</span></div>
-        <div class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Updated inquiry notes platform. Manage and review inquiry records for NETstar.</div>
-      </div>
-      <span class="font-mono text-[0.65rem] text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/20 px-2.5 py-1.5 rounded-lg border border-cyan-100 dark:border-cyan-800/30 truncate block">inquirynotes.vercel.app</span>
-    </a>
+            <tr class="row-link fade-in"
+                style="--row-accent:#f43f5e"
+                onclick="window.open('https://vender-ashen.vercel.app/','_blank')">
+              <td class="px-4 py-3.5">
+                <div class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/30 flex items-center justify-center">🔒</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs">Security Checker</div>
+                <div class="text-[0.6rem] text-slate-400 mt-0.5">Vendor verification</div>
+              </td>
+              <td class="px-4 py-3.5 hidden md:table-cell text-xs text-slate-500 dark:text-slate-500 max-w-xs">Vendor/security verification tool for checking and validating security status.</td>
+              <td class="px-4 py-3.5">
+                <span class="font-mono text-[0.6rem] text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 px-2 py-1 rounded-md border border-rose-100 dark:border-rose-800/30 whitespace-nowrap">vender-ashen.vercel.app</span>
+              </td>
+              <td class="pr-4 text-slate-300 dark:text-slate-700 text-xs text-right">↗</td>
+            </tr>
 
-    <!-- Partner Portal -->
-    <a href="https://template-red-three.vercel.app/" target="_blank"
-       class="card-bar card-glow relative bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline text-inherit animate-fade-up"
-       style="--bar-color:#ef4444; --glow:rgba(239,68,68,0.4); --glow-soft:rgba(239,68,68,0.12)">
-      <div class="flex items-start justify-between">
-        <div class="w-11 h-11 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/40 flex items-center justify-center text-xl">🤝</div>
-        <span class="text-slate-300 dark:text-slate-600 text-sm">↗</span>
+          </tbody>
+        </table>
       </div>
-      <div>
-        <div class="font-bold text-sm mb-1 text-slate-800 dark:text-slate-100">Partner Portal</div>
-        <div class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Portal for managing partner-related templates and communications.</div>
-      </div>
-      <span class="font-mono text-[0.65rem] text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2.5 py-1.5 rounded-lg border border-red-100 dark:border-red-800/30 truncate block">template-red-three.vercel.app</span>
-    </a>
-
-    <!-- URL Cutter -->
-    <a href="https://cut-new.vercel.app/" target="_blank"
-       class="card-bar card-glow relative bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline text-inherit animate-fade-up"
-       style="--bar-color:#8b5cf6; --glow:rgba(139,92,246,0.4); --glow-soft:rgba(139,92,246,0.12)">
-      <div class="flex items-start justify-between">
-        <div class="w-11 h-11 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-100 dark:border-violet-800/40 flex items-center justify-center text-xl">✂️</div>
-        <span class="text-slate-300 dark:text-slate-600 text-sm">↗</span>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-1 text-slate-800 dark:text-slate-100">URL Cutter Tools</div>
-        <div class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Utility for shortening and cutting long URLs for quick sharing.</div>
-      </div>
-      <span class="font-mono text-[0.65rem] text-violet-500 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2.5 py-1.5 rounded-lg border border-violet-100 dark:border-violet-800/30 truncate block">cut-new.vercel.app</span>
-    </a>
-
-    <!-- Category Management -->
-    <a href="https://category-phi.vercel.app/" target="_blank"
-       class="card-bar card-glow relative bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline text-inherit animate-fade-up"
-       style="--bar-color:#0ea5e9; --glow:rgba(14,165,233,0.4); --glow-soft:rgba(14,165,233,0.12)">
-      <div class="flex items-start justify-between">
-        <div class="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/40 flex items-center justify-center text-xl">🗂️</div>
-        <span class="text-slate-300 dark:text-slate-600 text-sm">↗</span>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-1 text-slate-800 dark:text-slate-100">Category Management Search</div>
-        <div class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Search and manage category entries efficiently for NETstar classification.</div>
-      </div>
-      <span class="font-mono text-[0.65rem] text-sky-500 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2.5 py-1.5 rounded-lg border border-sky-100 dark:border-sky-800/30 truncate block">category-phi.vercel.app</span>
-    </a>
-
-    <!-- Security Checker -->
-    <a href="https://vender-ashen.vercel.app/" target="_blank"
-       class="card-bar card-glow relative bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline text-inherit animate-fade-up"
-       style="--bar-color:#f43f5e; --glow:rgba(244,63,94,0.4); --glow-soft:rgba(244,63,94,0.12)">
-      <div class="flex items-start justify-between">
-        <div class="w-11 h-11 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/40 flex items-center justify-center text-xl">🔒</div>
-        <span class="text-slate-300 dark:text-slate-600 text-sm">↗</span>
-      </div>
-      <div>
-        <div class="font-bold text-sm mb-1 text-slate-800 dark:text-slate-100">Security Checker</div>
-        <div class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Vendor/security verification tool for checking and validating security status.</div>
-      </div>
-      <span class="font-mono text-[0.65rem] text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 px-2.5 py-1.5 rounded-lg border border-rose-100 dark:border-rose-800/30 truncate block">vender-ashen.vercel.app</span>
-    </a>
-
-  </div>
+    </div>
+  </section>
 
 </main>
 
-<footer class="relative z-10 max-w-6xl mx-auto px-5 py-6 mt-6 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
-  <span class="text-xs text-slate-400 dark:text-slate-600">📘 NETstar URL Notes &nbsp;·&nbsp; Internal Use Only</span>
-  <span class="text-xs text-slate-300 dark:text-slate-700 font-mono">2025</span>
+<footer class="relative z-10 max-w-5xl mx-auto px-6 py-5 mt-2 border-t border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between">
+  <span class="text-[0.65rem] text-slate-400 dark:text-slate-700">📘 NETstar URL Notes · Internal Use Only</span>
+  <span class="text-[0.65rem] text-slate-300 dark:text-slate-800 font-mono">2025</span>
 </footer>
 
 <!-- Toast -->
-<div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-brand-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-brand-600/30 translate-y-16 opacity-0 transition-all duration-300 pointer-events-none">
-  ✅ Copied to clipboard!
+<div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-indigo-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg translate-y-14 opacity-0 transition-all duration-300 pointer-events-none">
+  ✅ Copied!
 </div>
 
 <script>
@@ -302,13 +312,8 @@
   });
 
   function setTheme(t) {
-    if (t === 'dark') {
-      html.classList.add('dark');
-      icon.textContent = '☀️';
-    } else {
-      html.classList.remove('dark');
-      icon.textContent = '🌙';
-    }
+    html.classList.toggle('dark', t === 'dark');
+    icon.textContent = t === 'dark' ? '☀️' : '🌙';
   }
 
   function copyText(text, el) {
@@ -316,10 +321,10 @@
       el.textContent = '✅';
       setTimeout(() => el.textContent = '📋', 1500);
       clearTimeout(toastTimer);
-      toast.classList.remove('translate-y-16', 'opacity-0');
+      toast.classList.remove('translate-y-14', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
       toastTimer = setTimeout(() => {
-        toast.classList.add('translate-y-16', 'opacity-0');
+        toast.classList.add('translate-y-14', 'opacity-0');
         toast.classList.remove('translate-y-0', 'opacity-100');
       }, 2000);
     });
