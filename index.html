@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%236366f1'/><stop offset='40%25' stop-color='%23a855f7'/><stop offset='100%25' stop-color='%23ec4899'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='url(%23g)'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='18' font-weight='900' fill='white'>N</text></svg>"/>
 <title>NETstar · Internal Tools Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg0:        #020617;
@@ -12,52 +16,35 @@
   --bg2:        #0f172a;
   --surface:    rgba(15,23,42,0.82);
   --surface2:   rgba(22,32,56,0.72);
-  --glass:      rgba(255,255,255,0.035);
   --border:     rgba(99,130,220,0.14);
   --border-h:   rgba(99,179,237,0.5);
   --text:       #e2e8f8;
   --text-dim:   #64748b;
   --text-mid:   #94a3b8;
-
   --indigo:     #6366f1;
   --purple:     #a855f7;
-  --blue:       #3b82f6;
   --cyan:       #06b6d4;
   --pink:       #ec4899;
   --emerald:    #10b981;
   --amber:      #f59e0b;
   --rose:       #f43f5e;
-
   --grad-main:  linear-gradient(135deg, #6366f1 0%, #a855f7 40%, #3b82f6 70%, #ec4899 100%);
   --grad-table: linear-gradient(90deg, rgba(99,102,241,0.06), rgba(168,85,247,0.04), transparent);
-
-  --r-sm:  6px;
-  --r-md:  10px;
-  --r-lg:  14px;
-  --r-xl:  18px;
-
   --glow-indigo: 0 0 20px rgba(99,102,241,0.35), 0 0 40px rgba(99,102,241,0.12);
   --glow-cyan:   0 0 20px rgba(6,182,212,0.35), 0 0 40px rgba(6,182,212,0.1);
-  --glow-pink:   0 0 20px rgba(236,72,153,0.3);
 }
-
 [data-theme="light"] {
   --bg0:      #f1f5fe;
-  --bg1:      #e8effe;
-  --bg2:      #dde6fc;
   --surface:  rgba(255,255,255,0.88);
   --surface2: rgba(241,245,254,0.9);
-  --glass:    rgba(255,255,255,0.6);
   --border:   rgba(99,130,220,0.2);
   --border-h: rgba(99,102,241,0.5);
   --text:     #0f172a;
   --text-dim: #64748b;
   --text-mid: #475569;
 }
-
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; font-size:15px; }
-
+html { scroll-behavior:smooth; }
 body {
   font-family:'Outfit', system-ui, sans-serif;
   background: var(--bg0);
@@ -65,9 +52,7 @@ body {
   min-height:100vh;
   overflow-x:hidden;
   transition: background 0.4s ease, color 0.4s ease;
-  cursor: default;
 }
-
 body::before {
   content:'';
   position:fixed; inset:0; z-index:0; pointer-events:none;
@@ -77,130 +62,78 @@ body::before {
   animation: driftGrid 40s linear infinite;
 }
 @keyframes driftGrid { 0%{background-position:0 0} 100%{background-position:30px 30px} }
-
 body::after {
-  content:'';
-  position:fixed; inset:0; z-index:0; pointer-events:none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.04) 2px,
-    rgba(0,0,0,0.04) 4px
-  );
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
 }
-
 .ambient { position:fixed; pointer-events:none; z-index:0; border-radius:50%; filter:blur(110px); }
 .amb-1 { width:600px;height:600px; background:rgba(99,102,241,0.09); top:-150px; left:-150px; animation:ambFloat 12s ease-in-out infinite alternate; }
 .amb-2 { width:500px;height:500px; background:rgba(168,85,247,0.07); bottom:-100px; right:-100px; animation:ambFloat 15s ease-in-out infinite alternate-reverse; }
 .amb-3 { width:350px;height:350px; background:rgba(6,182,212,0.06); top:35%; left:55%; animation:ambFloat 10s ease-in-out infinite alternate; }
 .amb-4 { width:300px;height:300px; background:rgba(236,72,153,0.05); top:60%; left:20%; animation:ambFloat 18s ease-in-out infinite alternate-reverse; }
-@keyframes ambFloat {
-  0%   { transform:translate(0,0) scale(1); }
-  100% { transform:translate(40px,30px) scale(1.12); }
-}
+@keyframes ambFloat { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(40px,30px) scale(1.12)} }
 
 #portal { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; }
 
 #topbar {
-  position: sticky; top:0; z-index:200;
-  background: rgba(2,6,23,0.88);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  padding: 0 28px;
-  height: 64px;
+  position:sticky; top:0; z-index:200;
+  background:rgba(2,6,23,0.88);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(24px) saturate(180%);
+  padding:0 28px; height:64px;
   display:flex; align-items:center; justify-content:space-between; gap:20px;
-  animation: slideDown 0.5s ease;
+  animation:slideDown 0.5s ease;
 }
+[data-theme="light"] #topbar { background:rgba(241,245,254,0.92); }
 @keyframes slideDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
 
-.topbar-brand { display:flex; align-items:center; gap:14px; flex-shrink:0; }
 .brand-mark {
   width:38px; height:38px; border-radius:10px;
-  background: var(--grad-main);
+  background:var(--grad-main);
   display:flex; align-items:center; justify-content:center;
-  font-size:18px; font-weight:900;
-  box-shadow: var(--glow-indigo);
-  position:relative; overflow:hidden;
+  font-family:'Bebas Neue',sans-serif; font-size:20px; font-weight:900; color:#fff;
+  box-shadow:var(--glow-indigo); position:relative; overflow:hidden; flex-shrink:0;
 }
-.brand-mark::after {
-  content:'';
-  position:absolute; inset:0;
-  background:linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+.brand-mark::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent); }
+.brand-name {
+  font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:0.12em;
+  background:var(--grad-main); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
-.brand-text { line-height:1.1; }
-.brand-text h1 {
-  font-family:'Bebas Neue', sans-serif;
-  font-size:20px; letter-spacing:0.12em;
-  background: var(--grad-main);
-  -webkit-background-clip: text; -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-.brand-text span { font-size:10px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; }
+.brand-sub { font-size:10px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; }
 
-.topbar-center { flex:1; max-width:440px; }
-.search-box { position:relative; width:100%; }
+.search-box { position:relative; width:100%; max-width:440px; }
 .search-box input {
-  width:100%;
-  padding:9px 16px 9px 42px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius:40px;
-  color: var(--text);
-  font-family:'Outfit',sans-serif; font-size:13px;
-  outline:none;
-  transition: all 0.25s;
+  width:100%; padding:9px 16px 9px 42px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:40px; color:var(--text);
+  font-family:'Outfit',sans-serif; font-size:13px; outline:none; transition:all 0.25s;
 }
 .search-box input::placeholder { color:var(--text-dim); }
-.search-box input:focus {
-  border-color: var(--indigo);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.18), var(--glow-indigo);
-  background: var(--surface);
-}
-.search-box .s-ico {
-  position:absolute; left:14px; top:50%; transform:translateY(-50%);
-  color:var(--text-dim); pointer-events:none;
-  transition: color 0.2s;
-}
-.search-box input:focus ~ .s-ico { color:var(--indigo); }
-
-.topbar-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.search-box input:focus { border-color:var(--indigo); box-shadow:0 0 0 3px rgba(99,102,241,0.18),var(--glow-indigo); background:var(--surface); }
+.search-ico { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-dim); pointer-events:none; }
 
 #live-clock {
   font-family:'DM Mono',monospace; font-size:12px; color:var(--cyan);
   background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2);
-  padding:5px 12px; border-radius:20px;
-  letter-spacing:0.05em;
+  padding:5px 12px; border-radius:20px; letter-spacing:0.05em;
 }
-
 .status-pill {
   display:flex; align-items:center; gap:6px;
   background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25);
   padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600;
   color:var(--emerald); letter-spacing:0.04em;
 }
-.status-dot {
-  width:7px;height:7px; border-radius:50%; background:var(--emerald);
-  box-shadow:0 0 8px var(--emerald);
-  animation:pulse 2s ease-in-out infinite;
-}
+.status-dot { width:7px;height:7px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);animation:pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
 
 .ico-btn {
   width:36px; height:36px; border-radius:9px;
   background:var(--surface2); border:1px solid var(--border);
   display:flex; align-items:center; justify-content:center;
-  cursor:pointer; color:var(--text-mid); font-size:15px;
-  transition:all 0.2s;
+  cursor:pointer; color:var(--text-mid);
+  transition:all 0.2s; flex-shrink:0;
 }
-.ico-btn:hover {
-  background:rgba(99,102,241,0.15); border-color:var(--indigo);
-  color:var(--text); transform:scale(1.06);
-  box-shadow:var(--glow-indigo);
-}
-
-.theme-btn { position:relative; overflow:hidden; }
+.ico-btn:hover { background:rgba(99,102,241,0.15); border-color:var(--indigo); color:var(--text); transform:scale(1.06); box-shadow:var(--glow-indigo); }
 [data-theme="dark"]  .ico-sun  { display:none; }
 [data-theme="light"] .ico-moon { display:none; }
 
@@ -208,46 +141,24 @@ body::after {
   width:34px;height:34px;border-radius:50%;
   background:var(--grad-main);
   display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:800;color:#fff;cursor:pointer;
-  box-shadow:var(--glow-indigo);
-  transition:transform 0.2s;
+  font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;cursor:pointer;
+  box-shadow:var(--glow-indigo);transition:transform 0.2s;flex-shrink:0;
 }
 .avatar:hover { transform:scale(1.08); }
 
 #content { flex:1; padding:28px 28px 48px; max-width:1600px; margin:0 auto; width:100%; }
 
-.stats-grid {
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:16px; margin-bottom:28px;
-}
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
 .stat-card {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--r-xl);
-  padding:20px 22px;
-  backdrop-filter:blur(16px);
+  background:var(--surface); border:1px solid var(--border); border-radius:18px;
+  padding:20px 22px; backdrop-filter:blur(16px);
   position:relative; overflow:hidden;
   opacity:0; animation:fadeUp 0.5s ease forwards;
   transition:border-color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
-.stat-card::before {
-  content:''; position:absolute; inset:0; border-radius:var(--r-xl);
-  background: var(--grad-table); opacity:0.5;
-}
-.stat-card:hover {
-  border-color:var(--border-h);
-  transform:translateY(-3px);
-  box-shadow:0 8px 32px rgba(99,102,241,0.18);
-}
-.stat-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; position:relative; }
-.stat-icon-wrap {
-  width:42px;height:42px;border-radius:11px;
-  display:flex;align-items:center;justify-content:center; font-size:20px;
-}
-.stat-num {
-  font-family:'Bebas Neue',sans-serif; font-size:36px; line-height:1;
-  position:relative;
-}
+.stat-card::before { content:''; position:absolute; inset:0; background:var(--grad-table); opacity:0.5; }
+.stat-card:hover { border-color:var(--border-h); transform:translateY(-3px); box-shadow:0 8px 32px rgba(99,102,241,0.18); }
+.stat-num { font-family:'Bebas Neue',sans-serif; font-size:36px; line-height:1; position:relative; }
 .stat-label { font-size:12px; color:var(--text-dim); font-weight:500; letter-spacing:0.04em; position:relative; }
 .stat-sub { font-size:11px; color:var(--text-mid); margin-top:4px; position:relative; }
 
@@ -256,18 +167,12 @@ body::after {
   margin-bottom:20px; flex-wrap:wrap; gap:12px;
   opacity:0; animation:fadeUp 0.5s ease 0.1s forwards;
 }
-.panel-title { display:flex; align-items:center; gap:12px; }
-.panel-title h2 {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:22px; letter-spacing:0.08em; color:var(--text);
-}
-.panel-title .pill-count {
+.panel-title-text { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.08em; color:var(--text); }
+.pill-count {
   background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.3);
   color:var(--indigo); font-size:11px; font-weight:700;
   padding:3px 10px; border-radius:20px; letter-spacing:0.04em;
 }
-
-.filter-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .cat-select {
   padding:8px 14px; background:var(--surface2); border:1px solid var(--border);
   border-radius:8px; color:var(--text); font-family:'Outfit',sans-serif; font-size:12px;
@@ -275,82 +180,80 @@ body::after {
 }
 .cat-select:focus { border-color:var(--indigo); }
 .filter-tog {
+  display:flex; align-items:center; gap:6px;
   padding:7px 14px; border-radius:8px; border:1px solid var(--border);
   background:transparent; color:var(--text-dim); font-size:11px; font-weight:600;
-  cursor:pointer; transition:all 0.2s; letter-spacing:0.04em;
-  font-family:'Outfit',sans-serif;
+  cursor:pointer; transition:all 0.2s; letter-spacing:0.04em; font-family:'Outfit',sans-serif;
 }
 .filter-tog.on { background:rgba(99,102,241,0.18); border-color:var(--indigo); color:var(--indigo); }
 .filter-tog:hover { border-color:var(--border-h); color:var(--text); }
-
 .export-btn {
   display:flex; align-items:center; gap:7px;
   padding:8px 16px; border-radius:8px;
   background:linear-gradient(135deg,var(--indigo),var(--purple));
   border:none; color:#fff; font-size:12px; font-weight:600;
-  cursor:pointer; transition:all 0.2s;
-  font-family:'Outfit',sans-serif; letter-spacing:0.03em;
+  cursor:pointer; transition:all 0.2s; font-family:'Outfit',sans-serif; letter-spacing:0.03em;
 }
 .export-btn:hover { transform:scale(1.04); box-shadow:var(--glow-indigo); }
 
 .table-shell {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--r-xl);
-  overflow:hidden;
-  backdrop-filter:blur(20px);
+  background:var(--surface); border:1px solid var(--border); border-radius:18px;
+  overflow:hidden; backdrop-filter:blur(20px);
   opacity:0; animation:fadeUp 0.5s ease 0.15s forwards;
 }
 .table-wrap { overflow-x:auto; }
-
 table { width:100%; border-collapse:collapse; min-width:900px; }
-thead tr {
-  background:rgba(99,102,241,0.07);
-  border-bottom:1px solid var(--border);
-}
+thead tr { background:rgba(99,102,241,0.07); border-bottom:1px solid var(--border); }
 th {
-  padding:13px 18px;
-  text-align:left; font-size:10px; font-weight:700;
-  letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);
-  white-space:nowrap;
+  padding:13px 18px; text-align:left; font-size:10px; font-weight:700;
+  letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); white-space:nowrap;
 }
 th:first-child { padding-left:22px; }
 th:last-child  { padding-right:22px; }
-
 tbody tr {
   border-bottom:1px solid rgba(99,130,220,0.07);
-  opacity:0;
-  animation:rowSlideIn 0.45s ease forwards;
-  cursor:pointer;
-  transition:background 0.2s, box-shadow 0.2s;
-  position:relative;
+  opacity:0; animation:rowSlideIn 0.45s ease forwards;
+  cursor:pointer; transition:background 0.2s, box-shadow 0.2s; position:relative;
 }
 tbody tr:last-child { border-bottom:none; }
-tbody tr:hover {
-  background:rgba(99,102,241,0.06);
-  box-shadow:inset 4px 0 0 var(--indigo), inset -1px 0 0 rgba(99,102,241,0.12);
-}
-tbody tr.hidden-row { display:none; }
-
+tbody tr:hover { background:rgba(99,102,241,0.06); box-shadow:inset 4px 0 0 var(--indigo),inset -1px 0 0 rgba(99,102,241,0.12); }
 td { padding:14px 18px; vertical-align:middle; font-size:13px; }
 td:first-child { padding-left:22px; }
 td:last-child  { padding-right:22px; }
 
-@keyframes rowSlideIn {
-  from { opacity:0; transform:translateX(-10px); }
-  to   { opacity:1; transform:translateX(0); }
-}
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(16px); }
-  to   { opacity:1; transform:translateY(0); }
-}
+@keyframes rowSlideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+@keyframes fadeUp     { from{opacity:0;transform:translateY(16px)}   to{opacity:1;transform:translateY(0)} }
 
-.cell-icon { font-size:22px; line-height:1; }
-.cell-icon svg, .cell-icon img { display:block; }
+/* Tool icon container */
+.tool-icon-wrap {
+  width:40px; height:40px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  ring: 1px solid rgba(255,255,255,0.08);
+  box-shadow:0 4px 16px rgba(0,0,0,0.25);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+tbody tr:hover .tool-icon-wrap { transform:scale(1.08); }
+
+/* Category-specific icon themes */
+.icon-docs     { background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(59,130,246,0.2));  box-shadow:0 4px 16px rgba(99,102,241,0.2); }
+.icon-security { background:linear-gradient(135deg,rgba(239,68,68,0.22),rgba(244,63,94,0.18));   box-shadow:0 4px 16px rgba(244,63,94,0.2); }
+.icon-inquiry  { background:linear-gradient(135deg,rgba(168,85,247,0.22),rgba(139,92,246,0.18)); box-shadow:0 4px 16px rgba(168,85,247,0.2); }
+.icon-dispute  { background:linear-gradient(135deg,rgba(245,158,11,0.22),rgba(249,115,22,0.18)); box-shadow:0 4px 16px rgba(245,158,11,0.2); }
+.icon-utility  { background:linear-gradient(135deg,rgba(6,182,212,0.22),rgba(20,184,166,0.18));  box-shadow:0 4px 16px rgba(6,182,212,0.2); }
+.icon-partner  { background:linear-gradient(135deg,rgba(16,185,129,0.22),rgba(5,150,105,0.18));  box-shadow:0 4px 16px rgba(16,185,129,0.2); }
+.icon-corp     { background:linear-gradient(135deg,rgba(236,72,153,0.22),rgba(217,70,239,0.18)); box-shadow:0 4px 16px rgba(236,72,153,0.2); }
+
+.icon-docs     i { color:#818cf8; }
+.icon-security i { color:#f87171; }
+.icon-inquiry  i { color:#c084fc; }
+.icon-dispute  i { color:#fbbf24; }
+.icon-utility  i { color:#22d3ee; }
+.icon-partner  i { color:#34d399; }
+.icon-corp     i { color:#f472b6; }
 
 .cell-name { font-weight:700; color:var(--text); font-size:14px; white-space:nowrap; }
 .cell-name small { display:block; font-size:11px; color:var(--text-dim); font-weight:400; margin-top:2px; }
-
 .cell-desc { color:var(--text-mid); font-size:12px; max-width:240px; line-height:1.5; }
 
 .cell-url a {
@@ -361,53 +264,51 @@ td:last-child  { padding-right:22px; }
   transition:all 0.2s; max-width:220px;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.cell-url a:hover {
-  background:rgba(6,182,212,0.15); border-color:var(--cyan);
-  box-shadow:var(--glow-cyan);
-}
+.cell-url a:hover { background:rgba(6,182,212,0.15); border-color:var(--cyan); box-shadow:var(--glow-cyan); }
 
+/* Category badges */
 .cat-badge {
   display:inline-flex; align-items:center; gap:5px;
   padding:4px 10px; border-radius:20px;
-  font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
-  white-space:nowrap;
+  font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap;
 }
-.badge-docs     { background:rgba(99,102,241,0.15); color:var(--indigo);   border:1px solid rgba(99,102,241,0.3); }
-.badge-security { background:rgba(239,68,68,0.12);  color:#f87171;         border:1px solid rgba(239,68,68,0.25); }
-.badge-inquiry  { background:rgba(168,85,247,0.15); color:var(--purple);   border:1px solid rgba(168,85,247,0.3); }
-.badge-dispute  { background:rgba(245,158,11,0.12); color:var(--amber);    border:1px solid rgba(245,158,11,0.25); }
-.badge-utility  { background:rgba(6,182,212,0.12);  color:var(--cyan);     border:1px solid rgba(6,182,212,0.25); }
-.badge-partner  { background:rgba(16,185,129,0.12); color:var(--emerald);  border:1px solid rgba(16,185,129,0.25); }
-.badge-corp     { background:rgba(236,72,153,0.12); color:var(--pink);     border:1px solid rgba(236,72,153,0.25); }
+.badge-docs     { background:rgba(99,102,241,0.15);  color:#818cf8;  border:1px solid rgba(99,102,241,0.3); }
+.badge-security { background:rgba(239,68,68,0.12);   color:#f87171;  border:1px solid rgba(239,68,68,0.25); }
+.badge-inquiry  { background:rgba(168,85,247,0.15);  color:#c084fc;  border:1px solid rgba(168,85,247,0.3); }
+.badge-dispute  { background:rgba(245,158,11,0.12);  color:#fbbf24;  border:1px solid rgba(245,158,11,0.25); }
+.badge-utility  { background:rgba(6,182,212,0.12);   color:#22d3ee;  border:1px solid rgba(6,182,212,0.25); }
+.badge-partner  { background:rgba(16,185,129,0.12);  color:#34d399;  border:1px solid rgba(16,185,129,0.25); }
+.badge-corp     { background:rgba(236,72,153,0.12);  color:#f472b6;  border:1px solid rgba(236,72,153,0.25); }
 
+.badge-docs     i { color:#818cf8; }
+.badge-security i { color:#f87171; }
+.badge-inquiry  i { color:#c084fc; }
+.badge-dispute  i { color:#fbbf24; }
+.badge-utility  i { color:#22d3ee; }
+.badge-partner  i { color:#34d399; }
+.badge-corp     i { color:#f472b6; }
+
+/* Credentials */
 .cred-wrap { display:flex; flex-direction:column; gap:5px; min-width:200px; }
 .cred-row {
   display:flex; align-items:center; gap:6px;
   background:rgba(0,0,0,0.3); border:1px solid rgba(99,130,220,0.15);
   border-radius:6px; padding:5px 8px;
   font-family:'DM Mono',monospace; font-size:11px; color:var(--text-mid);
-  position:relative;
 }
-.cred-row .cred-label {
-  font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
-  color:var(--text-dim); min-width:30px;
-}
-.cred-row .cred-val { flex:1; color:var(--text); }
-.cred-row .cred-mask { letter-spacing:0.12em; color:var(--text-dim); }
-.cred-row .cred-toggle {
+.cred-label { font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); min-width:30px; }
+.cred-val { flex:1; color:var(--text); }
+.cred-mask { letter-spacing:0.12em; color:var(--text-dim); }
+.cred-toggle, .cred-copy {
   background:none; border:none; cursor:pointer; color:var(--text-dim);
-  font-size:12px; padding:0 2px; transition:color 0.2s;
-  line-height:1; flex-shrink:0;
+  padding:0 2px; transition:color 0.2s; line-height:1; flex-shrink:0;
+  display:flex; align-items:center;
 }
-.cred-row .cred-toggle:hover { color:var(--cyan); }
-.cred-row .cred-copy {
-  background:none; border:none; cursor:pointer; color:var(--text-dim);
-  font-size:11px; padding:0 2px; transition:color 0.2s;
-  line-height:1; flex-shrink:0;
-}
-.cred-row .cred-copy:hover { color:var(--indigo); }
+.cred-toggle:hover { color:var(--cyan); }
+.cred-copy:hover   { color:var(--indigo); }
 .no-cred { color:var(--text-dim); font-size:12px; font-style:italic; }
 
+/* Actions */
 .act-wrap { display:flex; gap:7px; }
 .act-open {
   padding:7px 14px; border-radius:7px;
@@ -426,39 +327,27 @@ td:last-child  { padding-right:22px; }
 }
 .act-copy:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(6,182,212,0.08); }
 
-#empty-state {
-  display:none; padding:60px 20px; text-align:center;
-}
-#empty-state .e-icon { font-size:48px; margin-bottom:16px; opacity:0.4; }
-#empty-state p { color:var(--text-dim); font-size:14px; }
+#empty-state { display:none; padding:60px 20px; text-align:center; }
+#empty-state p { color:var(--text-dim); font-size:14px; margin-top:16px; }
 
-#toast-zone {
-  position:fixed; bottom:24px; right:24px; z-index:9999;
-  display:flex; flex-direction:column-reverse; gap:10px;
-}
+/* Toast */
+#toast-zone { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column-reverse; gap:10px; }
 .toast {
   display:flex; align-items:center; gap:12px;
   padding:13px 18px; border-radius:12px;
   background:var(--surface2); backdrop-filter:blur(24px);
   border:1px solid var(--border);
-  box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
   font-size:13px; font-weight:500; color:var(--text);
   min-width:260px; max-width:340px;
   animation:toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1), toastOut 0.3s ease 2.2s forwards;
-  pointer-events:none;
+  pointer-events:none; position:relative;
 }
-.toast-icon { font-size:18px; flex-shrink:0; }
 .toast.t-success { border-color:rgba(16,185,129,0.4); }
 .toast.t-success .toast-bar { background:var(--emerald); }
 .toast.t-info    { border-color:rgba(99,102,241,0.4); }
 .toast.t-info    .toast-bar { background:var(--indigo); }
-.toast.t-warn    { border-color:rgba(245,158,11,0.4); }
-.toast.t-warn    .toast-bar { background:var(--amber); }
-.toast-bar {
-  position:absolute; bottom:0; left:0; height:2px; border-radius:0 0 12px 12px;
-  animation:toastBar 2.5s linear forwards;
-  width:100%;
-}
+.toast-bar { position:absolute; bottom:0; left:0; height:2px; border-radius:0 0 12px 12px; animation:toastBar 2.5s linear forwards; width:100%; }
 @keyframes toastIn  { from{opacity:0;transform:translateX(60px) scale(0.9)} to{opacity:1;transform:translateX(0) scale(1)} }
 @keyframes toastOut { from{opacity:1} to{opacity:0;transform:translateX(40px)} }
 @keyframes toastBar { from{width:100%} to{width:0} }
@@ -470,20 +359,12 @@ footer {
   padding:18px 28px;
   display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
 }
-.footer-left { display:flex; align-items:center; gap:14px; }
-.footer-logo {
-  font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:0.1em;
-  background:var(--grad-main); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-}
+[data-theme="light"] footer { background:rgba(241,245,254,0.8); }
+.footer-logo { font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:0.1em; background:var(--grad-main); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .footer-text { font-size:11px; color:var(--text-dim); }
-.footer-right { display:flex; align-items:center; gap:16px; }
 .footer-link { font-size:11px; color:var(--text-dim); text-decoration:none; transition:color 0.2s; }
 .footer-link:hover { color:var(--indigo); }
-.footer-ver {
-  font-family:'DM Mono',monospace; font-size:10px;
-  color:var(--cyan); background:rgba(6,182,212,0.08);
-  border:1px solid rgba(6,182,212,0.18); padding:3px 8px; border-radius:4px;
-}
+.footer-ver { font-family:'DM Mono',monospace; font-size:10px; color:var(--cyan); background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.18); padding:3px 8px; border-radius:4px; }
 
 @media(max-width:780px) {
   #topbar { padding:0 14px; }
@@ -495,20 +376,12 @@ footer {
   table { min-width:0; }
   .hide-mobile { display:none; }
   tbody tr { display:block; border:1px solid var(--border); border-radius:12px; margin-bottom:12px; padding:12px 14px; }
-  tbody tr:hover { box-shadow:0 0 0 1px var(--indigo), 0 4px 16px rgba(99,102,241,0.18); }
+  tbody tr:hover { box-shadow:0 0 0 1px var(--indigo),0 4px 16px rgba(99,102,241,0.18); }
   td { display:flex; align-items:flex-start; padding:5px 0; border:none; }
-  td::before {
-    content:attr(data-label);
-    min-width:90px; font-size:10px; font-weight:700; text-transform:uppercase;
-    letter-spacing:0.08em; color:var(--text-dim); padding-top:1px;
-  }
+  td::before { content:attr(data-label); min-width:90px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim); padding-top:1px; }
   thead { display:none; }
   .cell-url a { max-width:180px; }
   footer { padding:14px; flex-direction:column; align-items:flex-start; }
-}
-@media(max-width:500px) {
-  .stats-grid { grid-template-columns:1fr 1fr; }
-  .stat-num { font-size:28px; }
 }
 
 .d0{animation-delay:.05s!important} .d1{animation-delay:.10s!important} .d2{animation-delay:.15s!important}
@@ -529,68 +402,80 @@ footer {
 <div id="portal">
 
   <header id="topbar">
-    <div class="topbar-brand">
+    <!-- Brand -->
+    <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
       <div class="brand-mark">N</div>
-      <div class="brand-text">
-        <h1>NETstar Tools Portal</h1>
-        <span>Internal Operations Dashboard</span>
+      <div style="line-height:1.1;">
+        <div class="brand-name">NETstar Tools Portal</div>
+        <div class="brand-sub">Internal Operations Dashboard</div>
       </div>
     </div>
 
-    <div class="topbar-center">
+    <!-- Search -->
+    <div class="topbar-center" style="flex:1;max-width:440px;">
       <div class="search-box">
-        <svg class="s-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span class="search-ico"><i data-lucide="search" style="width:15px;height:15px;"></i></span>
         <input type="text" id="globalSearch" placeholder="Search tools, URLs, categories…" autocomplete="off" oninput="applyFilters()"/>
       </div>
     </div>
 
-    <div class="topbar-right">
+    <!-- Right -->
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
       <div id="live-clock">00:00:00</div>
       <div class="status-pill">
         <div class="status-dot"></div>
         ALL SYSTEMS LIVE
       </div>
-      <button class="ico-btn theme-btn" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
-        <span class="ico-moon">🌙</span>
-        <span class="ico-sun">☀️</span>
+      <button class="ico-btn theme-btn" onclick="toggleTheme()" title="Toggle theme">
+        <span class="ico-moon"><i data-lucide="moon" style="width:16px;height:16px;"></i></span>
+        <span class="ico-sun"><i data-lucide="sun" style="width:16px;height:16px;"></i></span>
       </button>
-      <button class="ico-btn" onclick="toast('🔔 No new notifications','t-info')" title="Notifications">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <button class="ico-btn" onclick="toast('No new notifications','t-info')" title="Notifications">
+        <i data-lucide="bell" style="width:16px;height:16px;"></i>
       </button>
-      <div class="avatar" onclick="toast('👤 Logged in as NS Admin','t-info')">N</div>
+      <div class="avatar" onclick="toast('Logged in as NS Admin','t-info')">N</div>
     </div>
   </header>
 
   <main id="content">
 
+    <!-- Stats -->
     <div class="stats-grid">
       <div class="stat-card d0" style="border-top:2px solid var(--indigo)">
-        <div class="stat-top">
-          <div><div class="stat-icon-wrap" style="background:rgba(99,102,241,0.12);">🔗</div></div>
-          <div class="stat-num" style="color:var(--indigo)">15</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;position:relative;">
+          <div style="width:42px;height:42px;border-radius:11px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="layout-grid" style="width:20px;height:20px;color:#818cf8;"></i>
+          </div>
+          <div class="stat-num" style="color:var(--indigo)">16</div>
         </div>
         <div class="stat-label">Total Tools</div>
         <div class="stat-sub">Across 6 categories</div>
       </div>
       <div class="stat-card d1" style="border-top:2px solid var(--cyan)">
-        <div class="stat-top">
-          <div><div class="stat-icon-wrap" style="background:rgba(6,182,212,0.12);">🛠</div></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;position:relative;">
+          <div style="width:42px;height:42px;border-radius:11px;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="wrench" style="width:20px;height:20px;color:#22d3ee;"></i>
+          </div>
           <div class="stat-num" style="color:var(--cyan)">8</div>
         </div>
         <div class="stat-label">Utility Tools</div>
-        <div class="stat-sub">URL & file processors</div>
+        <div class="stat-sub">URL &amp; file processors</div>
       </div>
       <div class="stat-card d2" style="border-top:2px solid var(--rose)">
-        <div class="stat-top">
-          <div><div class="stat-icon-wrap" style="background:rgba(244,63,94,0.1);">🛡️</div></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;position:relative;">
+          <div style="width:42px;height:42px;border-radius:11px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.2);display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="shield" style="width:20px;height:20px;color:#fb7185;"></i>
+          </div>
           <div class="stat-num" style="color:var(--rose)">3</div>
         </div>
         <div class="stat-label">Security &amp; Reports</div>
         <div class="stat-sub">Vendor &amp; MS Defender</div>
       </div>
       <div class="stat-card d3" style="border-top:2px solid var(--emerald)">
-        <div class="stat-top">
-          <div><div class="stat-icon-wrap" style="background:rgba(16,185,129,0.1);">✅</div></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;position:relative;">
+          <div style="width:42px;height:42px;border-radius:11px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="check-circle" style="width:20px;height:20px;color:#34d399;"></i>
+          </div>
           <div class="stat-num" style="color:var(--emerald)">All</div>
         </div>
         <div class="stat-label">Portal Status</div>
@@ -598,12 +483,14 @@ footer {
       </div>
     </div>
 
+    <!-- Panel header -->
     <div class="panel-header">
-      <div class="panel-title">
-        <h2>📘 Operations Tools Index</h2>
-        <span class="pill-count" id="rowCount">15 entries</span>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <i data-lucide="book-open" style="width:20px;height:20px;color:var(--indigo);"></i>
+        <span class="panel-title-text">Operations Tools Index</span>
+        <span class="pill-count" id="rowCount">16 entries</span>
       </div>
-      <div class="filter-row">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <select class="cat-select" id="catFilter" onchange="applyFilters()">
           <option value="all">All Categories</option>
           <option value="docs">Documentation</option>
@@ -614,20 +501,24 @@ footer {
           <option value="partner">Partner &amp; Mgmt</option>
           <option value="corp">Corporate</option>
         </select>
-        <button class="filter-tog" id="tog-cred" onclick="toggleCredFilter(this)">🔐 Has Credentials</button>
+        <button class="filter-tog" id="tog-cred" onclick="toggleCredFilter(this)">
+          <i data-lucide="key-round" style="width:13px;height:13px;"></i>
+          Has Credentials
+        </button>
         <button class="export-btn" onclick="exportCSV()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <i data-lucide="download" style="width:13px;height:13px;"></i>
           Export CSV
         </button>
       </div>
     </div>
 
+    <!-- Table -->
     <div class="table-shell">
       <div class="table-wrap">
         <table id="mainTable">
           <thead>
             <tr>
-              <th style="width:50px"></th>
+              <th style="width:54px;"></th>
               <th>Tool Name</th>
               <th class="hide-mobile">Description</th>
               <th>URL</th>
@@ -639,7 +530,7 @@ footer {
           <tbody id="tableBody"></tbody>
         </table>
         <div id="empty-state">
-          <div class="e-icon">🔍</div>
+          <i data-lucide="search-x" style="width:48px;height:48px;color:var(--text-dim);margin:0 auto;display:block;opacity:0.4;"></i>
           <p>No tools match your search or filter.</p>
         </div>
       </div>
@@ -648,14 +539,14 @@ footer {
   </main>
 
   <footer>
-    <div class="footer-left">
+    <div style="display:flex;align-items:center;gap:14px;">
       <div class="footer-logo">NETstar</div>
       <div>
         <div class="footer-text" style="font-weight:600;">NETstar Internal Tools Portal</div>
         <div class="footer-text">Internal Operations Use Only &nbsp;·&nbsp; © 2026 NETstar Systems</div>
       </div>
     </div>
-    <div class="footer-right">
+    <div style="display:flex;align-items:center;gap:16px;">
       <a class="footer-link" href="#">Privacy Policy</a>
       <a class="footer-link" href="#">Support</a>
       <a class="footer-link" href="#">Changelog</a>
@@ -667,173 +558,144 @@ footer {
 
 <script>
 /* ═══════════════════════════════════════════════
-   D VIOLET SVG ICON (used for Dispute v2)
-═══════════════════════════════════════════════ */
-const D_VIOLET_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32"><defs><linearGradient id="dv" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#dv)"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="white">D</text></svg>`;
-
-/* ═══════════════════════════════════════════════
-   DATA
+   DATA — lucideIcon replaces emoji/letter
 ═══════════════════════════════════════════════ */
 const TOOLS = [
   {
-    id: 1, icon: '📄', name: 'Jira Ticket Docs',
-    sub: 'Documentation Reference',
-    desc: 'Internal Jira ticket documentation and project reference guide.',
-    url: 'https://docs.google.com/document/d/1JQwRrvTIApjQirSPqxnar35_L8v-RXowZLDPIwXlJqc/edit',
-    cat: 'docs', catLabel: 'Documentation', badgeClass: 'badge-docs',
-    creds: null
+    id:1, lucideIcon:'file-text', name:'Jira Ticket Docs',
+    sub:'Documentation Reference',
+    desc:'Internal Jira ticket documentation and project reference guide.',
+    url:'https://docs.google.com/document/d/1JQwRrvTIApjQirSPqxnar35_L8v-RXowZLDPIwXlJqc/edit',
+    cat:'docs', catLabel:'Documentation', badgeClass:'badge-docs', badgeIcon:'book-open',
+    creds:null
   },
   {
-    id: 2, icon: '🔑', name: 'Jira Portal Login',
-    sub: 'Corporate System',
-    desc: 'Atlassian login gateway → NETstar Jira project board access.',
-    url: 'https://id.atlassian.com/login?continue=JiraBoard',
-    cat: 'corp', catLabel: 'Corporate', badgeClass: 'badge-corp',
-    creds: [
-      { label: 'User', val: 'ns-jira-cebu@cebutele-net.com', masked: 'ns-jira-cebu@••••••••.com' },
-      { label: 'Pass', val: 'tele7222', masked: '••••••••' }
+    id:2, lucideIcon:'key-round', name:'Jira Portal Login',
+    sub:'Corporate System',
+    desc:'Atlassian login gateway → NETstar Jira project board access.',
+    url:'https://id.atlassian.com/login?continue=JiraBoard',
+    cat:'corp', catLabel:'Corporate', badgeClass:'badge-corp', badgeIcon:'building-2',
+    creds:[
+      { label:'User', val:'ns-jira-cebu@cebutele-net.com', masked:'ns-jira-cebu@••••••••.com' },
+      { label:'Pass', val:'tele7222', masked:'••••••••' }
     ]
   },
-
-
-
-{
-  id: 3,
-  icon: '🅷',
-  name: 'Handling Monitoring',
-  sub: 'Dispute Monitoring System',
-  desc: 'Handling monitoring dashboard for tracking disputes, partner portals, and inquiry assignments.',
-  url: 'https://handling-monitoring.vercel.app/',
-  cat: 'corp',
-  catLabel: 'Corporate',
-  badgeClass: 'badge-corp',
-  titleStyle: 'color: violet; font-weight: bold;',
-  creds: []
-},
-
-
-
-
-
-
-
-
-
-
-  
   {
-    id: 3, icon: '🛡️', name: 'Weekly MS Defender Report',
-    sub: 'Security Analytics',
-    desc: 'Weekly Microsoft Defender threat intelligence and security posture summary.',
-    url: 'https://weekly-ms-defender-report.vercel.app/',
-    cat: 'security', catLabel: 'Security', badgeClass: 'badge-security',
-    creds: null
+    id:3, lucideIcon:'activity', name:'Handling Monitoring',
+    sub:'Dispute Monitoring System',
+    desc:'Handling monitoring dashboard for tracking disputes, partner portals, and inquiry assignments.',
+    url:'https://handling-monitoring.vercel.app/',
+    cat:'corp', catLabel:'Corporate', badgeClass:'badge-corp', badgeIcon:'building-2',
+    creds:[]
   },
   {
-    id: 4, icon: '🔍', name: 'Inquiry Portal',
-    sub: 'Inquiry Tracking',
-    desc: 'Structured inquiry management portal with status tracking and filters.',
-    url: 'https://inquiry-ns.vercel.app/',
-    cat: 'inquiry', catLabel: 'Inquiry', badgeClass: 'badge-inquiry',
-    creds: null
+    id:4, lucideIcon:'shield-check', name:'Weekly MS Defender Report',
+    sub:'Security Analytics',
+    desc:'Weekly Microsoft Defender threat intelligence and security posture summary.',
+    url:'https://weekly-ms-defender-report.vercel.app/',
+    cat:'security', catLabel:'Security', badgeClass:'badge-security', badgeIcon:'shield',
+    creds:null
   },
   {
-    id: 5, icon: '📝', name: 'Inquiry Notes',
-    sub: 'Notes Dashboard',
-    desc: 'Enhanced inquiry notes portal — latest version with improved UI and tracking.',
-    url: 'https://inquirynotes.vercel.app/',
-    cat: 'inquiry', catLabel: 'Inquiry', badgeClass: 'badge-inquiry',
-    creds: null
+    id:5, lucideIcon:'search', name:'Inquiry Portal',
+    sub:'Inquiry Tracking',
+    desc:'Structured inquiry management portal with status tracking and filters.',
+    url:'https://inquiry-ns.vercel.app/',
+    cat:'inquiry', catLabel:'Inquiry', badgeClass:'badge-inquiry', badgeIcon:'help-circle',
+    creds:null
   },
   {
-    id: 6, icon: '⚙️', name: 'Dispute File Generator for diovic manual',
-    sub: 'Processing Tool',
-    desc: 'Generate formatted dispute files for internal processing and case workflows.',
-    url: 'https://disputes-1wgo.vercel.app/',
-    cat: 'dispute', catLabel: 'Dispute', badgeClass: 'badge-dispute',
-    creds: null
+    id:6, lucideIcon:'notebook-pen', name:'Inquiry Notes',
+    sub:'Notes Dashboard',
+    desc:'Enhanced inquiry notes portal — latest version with improved UI and tracking.',
+    url:'https://inquirynotes.vercel.app/',
+    cat:'inquiry', catLabel:'Inquiry', badgeClass:'badge-inquiry', badgeIcon:'help-circle',
+    creds:null
   },
   {
-    id: 7, icon: '✔️', name: 'CP P2 File Generator',
-    sub: 'Compliance Tool',
-    desc: 'Create CP/P2 categorized files for compliance and operational tasks.',
-    url: 'https://cp-p2-file-generator.vercel.app/',
-    cat: 'dispute', catLabel: 'Dispute', badgeClass: 'badge-dispute',
-    creds: null
+    id:7, lucideIcon:'file-cog', name:'Dispute File Generator for diovic manual',
+    sub:'Processing Tool',
+    desc:'Generate formatted dispute files for internal processing and case workflows.',
+    url:'https://disputes-1wgo.vercel.app/',
+    cat:'dispute', catLabel:'Dispute', badgeClass:'badge-dispute', badgeIcon:'alert-triangle',
+    creds:null
   },
   {
-    id: 8, icon: '🔎', name: 'No-Dot Finder',
-    sub: 'URL Utility',
-    desc: 'Detect and fix domain entries with missing dot notation or format errors.',
-    url: 'https://dot-finder.vercel.app/',
-    cat: 'utility', catLabel: 'Utility', badgeClass: 'badge-utility',
-    creds: null
+    id:8, lucideIcon:'check-square', name:'CP P2 File Generator',
+    sub:'Compliance Tool',
+    desc:'Create CP/P2 categorized files for compliance and operational tasks.',
+    url:'https://cp-p2-file-generator.vercel.app/',
+    cat:'dispute', catLabel:'Dispute', badgeClass:'badge-dispute', badgeIcon:'alert-triangle',
+    creds:null
   },
   {
-    id: 9, icon: '🔀', name: 'URL Merger Tool',
-    sub: 'URL Utility',
-    desc: 'Consolidate multiple URL lists into a single clean merged output.',
-    url: 'https://merge-url.vercel.app/',
-    cat: 'utility', catLabel: 'Utility', badgeClass: 'badge-utility',
-    creds: null
+    id:9, lucideIcon:'scan-search', name:'No-Dot Finder',
+    sub:'URL Utility',
+    desc:'Detect and fix domain entries with missing dot notation or format errors.',
+    url:'https://dot-finder.vercel.app/',
+    cat:'utility', catLabel:'Utility', badgeClass:'badge-utility', badgeIcon:'wrench',
+    creds:null
   },
   {
-    id: 10, icon: '🗑️', name: 'Duplicate Remover',
-    sub: 'URL Utility',
-    desc: 'Identify and strip duplicate entries from URL or data lists automatically.',
-    url: 'https://duplicate-remover-chi.vercel.app/',
-    cat: 'utility', catLabel: 'Utility', badgeClass: 'badge-utility',
-    creds: null
+    id:10, lucideIcon:'git-merge', name:'URL Merger Tool',
+    sub:'URL Utility',
+    desc:'Consolidate multiple URL lists into a single clean merged output.',
+    url:'https://merge-url.vercel.app/',
+    cat:'utility', catLabel:'Utility', badgeClass:'badge-utility', badgeIcon:'wrench',
+    creds:null
   },
   {
-    id: 11, icon: '✂️', name: 'URL Cutter Tools',
-    sub: 'URL Utility',
-    desc: 'Trim, shorten, and clean URLs for standardized internal use.',
-    url: 'https://cut-new.vercel.app/',
-    cat: 'utility', catLabel: 'Utility', badgeClass: 'badge-utility',
-    creds: null
+    id:11, lucideIcon:'copy-x', name:'Duplicate Remover',
+    sub:'URL Utility',
+    desc:'Identify and strip duplicate entries from URL or data lists automatically.',
+    url:'https://duplicate-remover-chi.vercel.app/',
+    cat:'utility', catLabel:'Utility', badgeClass:'badge-utility', badgeIcon:'wrench',
+    creds:null
   },
   {
-    id: 12, icon: '🤝', name: 'Partner Template Portal',
-    sub: 'Partner Tools',
-    desc: 'Pre-built templates for partner communications and onboarding workflows.',
-    url: 'https://template-red-three.vercel.app/',
-    cat: 'partner', catLabel: 'Partner', badgeClass: 'badge-partner',
-    creds: null
+    id:12, lucideIcon:'scissors', name:'URL Cutter Tools',
+    sub:'URL Utility',
+    desc:'Trim, shorten, and clean URLs for standardized internal use.',
+    url:'https://cut-new.vercel.app/',
+    cat:'utility', catLabel:'Utility', badgeClass:'badge-utility', badgeIcon:'wrench',
+    creds:null
   },
   {
-    id: 13, icon: '🗂️', name: 'Category Management',
-    sub: 'Management Tool',
-    desc: 'Manage and organize URL categories and asset classification across the platform.',
-    url: 'https://category-phi.vercel.app/',
-    cat: 'partner', catLabel: 'Partner', badgeClass: 'badge-partner',
-    creds: null
+    id:13, lucideIcon:'handshake', name:'Partner Template Portal',
+    sub:'Partner Tools',
+    desc:'Pre-built templates for partner communications and onboarding workflows.',
+    url:'https://template-red-three.vercel.app/',
+    cat:'partner', catLabel:'Partner', badgeClass:'badge-partner', badgeIcon:'users',
+    creds:null
   },
   {
-    id: 14, icon: '🔒', name: 'Vendor Security Checker',
-    sub: 'Security Tool',
-    desc: 'Assess vendor security posture, compliance status, and risk indicators.',
-    url: 'https://vender-ashen.vercel.app/',
-    cat: 'security', catLabel: 'Security', badgeClass: 'badge-security',
-    creds: null
+    id:14, lucideIcon:'folder-kanban', name:'Category Management',
+    sub:'Management Tool',
+    desc:'Manage and organize URL categories and asset classification across the platform.',
+    url:'https://category-phi.vercel.app/',
+    cat:'partner', catLabel:'Partner', badgeClass:'badge-partner', badgeIcon:'users',
+    creds:null
   },
   {
-    id: 15, icon: 'svg:D_VIOLET', name: 'Dispute File Generator v2',
-    sub: 'Team Processing Tool',
-    desc: 'Updated dispute file generator — shared team version with enhanced workflows.',
-    url: 'https://dispute2-for-team.vercel.app/',
-    cat: 'dispute', catLabel: 'Dispute', badgeClass: 'badge-dispute',
-    creds: null
+    id:15, lucideIcon:'shield-alert', name:'Vendor Security Checker',
+    sub:'Security Tool',
+    desc:'Assess vendor security posture, compliance status, and risk indicators.',
+    url:'https://vender-ashen.vercel.app/',
+    cat:'security', catLabel:'Security', badgeClass:'badge-security', badgeIcon:'shield',
+    creds:null
+  },
+  {
+    id:16, lucideIcon:'file-plus-2', name:'Dispute File Generator v2',
+    sub:'Team Processing Tool',
+    desc:'Updated dispute file generator — shared team version with enhanced workflows.',
+    url:'https://dispute2-for-team.vercel.app/',
+    cat:'dispute', catLabel:'Dispute', badgeClass:'badge-dispute', badgeIcon:'alert-triangle',
+    creds:null
   }
 ];
 
-/* ═══════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════ */
 let credVisible = {};
 let filterCred  = false;
-let currentQ    = '';
-let currentCat  = 'all';
 
 /* ═══════════════════════════════════════════════
    RENDER
@@ -846,6 +708,7 @@ function renderTable(data) {
     tbody.innerHTML = '';
     empty.style.display = 'block';
     document.getElementById('rowCount').textContent = '0 entries';
+    lucide.createIcons();
     return;
   }
   empty.style.display = 'none';
@@ -854,24 +717,19 @@ function renderTable(data) {
   tbody.innerHTML = data.map((t, i) => {
     const delay = Math.min(i * 0.05, 0.75);
 
-    /* Icon — support inline SVG for special icons */
-    const iconHTML = t.icon === 'svg:D_VIOLET' ? D_VIOLET_ICON : t.icon;
-
-    /* Credentials */
     let credHTML = '<span class="no-cred">—</span>';
-    if (t.creds) {
+    if (t.creds && t.creds.length > 0) {
       credHTML = `<div class="cred-wrap">${t.creds.map((c, ci) => {
         const vKey = `${t.id}_${ci}`;
         const shown = credVisible[vKey];
-        return `
-          <div class="cred-row">
+        return `<div class="cred-row">
             <span class="cred-label">${c.label}</span>
             <span class="cred-val" id="cv_${vKey}">${shown ? c.val : `<span class="cred-mask">${c.masked}</span>`}</span>
             <button class="cred-toggle" onclick="event.stopPropagation();toggleCred(${t.id},${ci},'${escAttr(c.val)}','${escAttr(c.masked)}')" title="${shown?'Hide':'Show'}">
-              ${shown ? '🙈' : '👁'}
+              <i data-lucide="${shown?'eye-off':'eye'}" style="width:13px;height:13px;"></i>
             </button>
-            <button class="cred-copy" onclick="event.stopPropagation();copyText('${escAttr(c.val)}','${c.label} copied!')" title="Copy ${c.label}">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <button class="cred-copy" onclick="event.stopPropagation();copyText('${escAttr(c.val)}','${c.label} copied!')" title="Copy">
+              <i data-lucide="copy" style="width:12px;height:12px;"></i>
             </button>
           </div>`;
       }).join('')}</div>`;
@@ -879,35 +737,44 @@ function renderTable(data) {
 
     const urlShort = t.url.replace(/^https?:\/\//,'').replace(/\/$/,'');
 
-    return `<tr class="d${Math.min(i,14)}" style="animation-delay:${delay}s"
-                 onclick="openTool('${escAttr(t.url)}')"
-                 data-cat="${t.cat}" data-name="${t.name.toLowerCase()}" data-desc="${t.desc.toLowerCase()}" data-url="${t.url.toLowerCase()}">
-      <td data-label="Icon" class="cell-icon">${iconHTML}</td>
+    return `<tr class="d${Math.min(i,14)}" style="animation-delay:${delay}s" onclick="openTool('${escAttr(t.url)}')" data-cat="${t.cat}">
+      <td data-label="Icon">
+        <div class="tool-icon-wrap icon-${t.cat}">
+          <i data-lucide="${t.lucideIcon}" style="width:20px;height:20px;stroke-width:1.75;"></i>
+        </div>
+      </td>
       <td data-label="Tool">
         <div class="cell-name">${t.name}<small>${t.sub}</small></div>
       </td>
       <td data-label="Desc" class="cell-desc hide-mobile">${t.desc}</td>
       <td data-label="URL" class="cell-url">
         <a href="${t.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${t.url}">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <i data-lucide="external-link" style="width:10px;height:10px;flex-shrink:0;"></i>
           ${urlShort.length > 30 ? urlShort.slice(0,30)+'…' : urlShort}
         </a>
       </td>
       <td data-label="Credentials" class="hide-mobile">${credHTML}</td>
-      <td data-label="Category"><span class="cat-badge ${t.badgeClass}">${t.catLabel}</span></td>
+      <td data-label="Category">
+        <span class="cat-badge ${t.badgeClass}">
+          <i data-lucide="${t.badgeIcon}" style="width:10px;height:10px;"></i>
+          ${t.catLabel}
+        </span>
+      </td>
       <td data-label="Action">
         <div class="act-wrap">
           <button class="act-open" onclick="event.stopPropagation();openTool('${escAttr(t.url)}')">
             Open
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            <i data-lucide="arrow-up-right" style="width:11px;height:11px;"></i>
           </button>
-          <button class="act-copy" onclick="event.stopPropagation();copyText('${escAttr(t.url)}','✂️ URL copied!')" title="Copy URL">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <button class="act-copy" onclick="event.stopPropagation();copyText('${escAttr(t.url)}','URL copied!')" title="Copy URL">
+            <i data-lucide="copy" style="width:13px;height:13px;"></i>
           </button>
         </div>
       </td>
     </tr>`;
   }).join('');
+
+  lucide.createIcons();
 }
 
 function escAttr(s) {
@@ -918,22 +785,18 @@ function escAttr(s) {
    FILTERS
 ═══════════════════════════════════════════════ */
 function applyFilters() {
-  currentQ   = (document.getElementById('globalSearch').value || '').toLowerCase().trim();
-  currentCat = document.getElementById('catFilter').value;
-
-  let data = TOOLS.filter(t => {
-    const matchQ = !currentQ ||
-      t.name.toLowerCase().includes(currentQ) ||
-      t.desc.toLowerCase().includes(currentQ) ||
-      t.url.toLowerCase().includes(currentQ)  ||
-      t.catLabel.toLowerCase().includes(currentQ);
-
-    const matchCat  = currentCat === 'all' || t.cat === currentCat;
+  const q   = (document.getElementById('globalSearch').value || '').toLowerCase().trim();
+  const cat = document.getElementById('catFilter').value;
+  const data = TOOLS.filter(t => {
+    const matchQ = !q ||
+      t.name.toLowerCase().includes(q) ||
+      t.desc.toLowerCase().includes(q) ||
+      t.url.toLowerCase().includes(q)  ||
+      t.catLabel.toLowerCase().includes(q);
+    const matchCat  = cat === 'all' || t.cat === cat;
     const matchCred = !filterCred || (t.creds && t.creds.length > 0);
-
     return matchQ && matchCat && matchCred;
   });
-
   renderTable(data);
 }
 
@@ -953,7 +816,10 @@ function toggleCred(toolId, ci, val, masked) {
   if (!el) return;
   el.innerHTML = credVisible[key] ? val : `<span class="cred-mask">${masked}</span>`;
   const btn = el.parentElement.querySelector('.cred-toggle');
-  if (btn) btn.textContent = credVisible[key] ? '🙈' : '👁';
+  if (btn) {
+    btn.innerHTML = `<i data-lucide="${credVisible[key]?'eye-off':'eye'}" style="width:13px;height:13px;"></i>`;
+    lucide.createIcons();
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -961,11 +827,11 @@ function toggleCred(toolId, ci, val, masked) {
 ═══════════════════════════════════════════════ */
 function openTool(url) {
   window.open(url,'_blank','noopener');
-  toast('🚀 Opening tool in new tab…','t-info');
+  toast('Opening tool in new tab…','t-info');
 }
 
 function copyText(text, msg) {
-  navigator.clipboard.writeText(text).then(() => toast(msg || '✅ Copied!','t-success'));
+  navigator.clipboard.writeText(text).then(() => toast(msg || 'Copied!','t-success'));
 }
 
 /* ═══════════════════════════════════════════════
@@ -973,27 +839,35 @@ function copyText(text, msg) {
 ═══════════════════════════════════════════════ */
 function exportCSV() {
   const rows = [['Icon','Tool Name','Category','URL','Description']];
-  TOOLS.forEach(t => rows.push([t.icon === 'svg:D_VIOLET' ? 'D' : t.icon, t.name, t.catLabel, t.url, `"${t.desc}"`]));
+  TOOLS.forEach(t => {
+    rows.push([t.lucideIcon, t.name, t.catLabel, t.url, `"${t.desc}"`]);
+  });
   const csv = rows.map(r=>r.join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download = 'netstar-tools.csv';
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('📤 CSV exported successfully!','t-success');
+  toast('CSV exported successfully!','t-success');
 }
 
 /* ═══════════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════════ */
 function toast(msg, type='t-info') {
-  const icons = {'t-success':'✅','t-info':'ℹ️','t-warn':'⚠️'};
+  const iconMap = {'t-success':'check-circle','t-info':'info','t-warn':'alert-triangle'};
   const zone = document.getElementById('toast-zone');
   const el   = document.createElement('div');
   el.className = `toast ${type}`;
   el.style.position = 'relative';
-  el.innerHTML = `<span class="toast-icon">${icons[type]||'ℹ️'}</span><span>${msg}</span><div class="toast-bar"></div>`;
+  el.innerHTML = `
+    <span style="display:flex;align-items:center;flex-shrink:0;">
+      <i data-lucide="${iconMap[type]||'info'}" style="width:18px;height:18px;color:${type==='t-success'?'#34d399':type==='t-warn'?'#fbbf24':'#818cf8'}"></i>
+    </span>
+    <span>${msg}</span>
+    <div class="toast-bar"></div>`;
   zone.appendChild(el);
+  lucide.createIcons();
   setTimeout(()=>{ el.style.animation='toastOut 0.3s ease forwards'; setTimeout(()=>el.remove(),350); }, 2500);
 }
 
@@ -1005,7 +879,7 @@ function toggleTheme() {
   const next = h.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
   h.setAttribute('data-theme', next);
   try { localStorage.setItem('ns-theme', next); } catch(e){}
-  toast(next==='light' ? '☀️ Light mode on' : '🌙 Dark mode on','t-info');
+  toast(next==='light' ? 'Light mode on' : 'Dark mode on','t-info');
 }
 (function loadTheme(){
   try {
@@ -1031,12 +905,8 @@ updateClock();
 ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   renderTable(TOOLS);
-  document.querySelectorAll('tbody tr').forEach((tr, i) => {
-    tr.style.animationDelay = `${0.05 + i * 0.045}s`;
-  });
+  lucide.createIcons();
 });
 </script>
 </body>
 </html>
-
-
