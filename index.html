@@ -9,6 +9,11 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <style>
 :root {
   --bg0:        #020617;
@@ -75,6 +80,148 @@ body::after {
 
 #portal { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; }
 
+/* ═══════════════════════════════════════════
+   VISIT MODAL
+═══════════════════════════════════════════ */
+#visitOverlay {
+  position:fixed; inset:0; z-index:9000;
+  backdrop-filter: blur(18px) saturate(160%);
+  background: rgba(2,6,23,0.72);
+  display:flex; align-items:center; justify-content:center;
+  animation: overlayIn 0.4s ease;
+}
+@keyframes overlayIn { from{opacity:0} to{opacity:1} }
+[data-theme="light"] #visitOverlay { background: rgba(241,245,254,0.65); }
+
+#visitModal {
+  background: var(--surface);
+  border: 1px solid rgba(99,102,241,0.35);
+  border-radius: 24px;
+  padding: 44px 48px;
+  max-width: 440px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.12),
+              0 32px 80px rgba(0,0,0,0.5),
+              var(--glow-indigo);
+  animation: modalPop 0.45s cubic-bezier(0.34,1.56,0.64,1);
+  backdrop-filter: blur(24px);
+}
+@keyframes modalPop {
+  from{opacity:0;transform:scale(0.8) translateY(20px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+.modal-glow-ring {
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 26px;
+  background: var(--grad-main);
+  z-index: -1;
+  opacity: 0.25;
+  filter: blur(8px);
+  animation: ringPulse 3s ease-in-out infinite;
+}
+@keyframes ringPulse { 0%,100%{opacity:0.2} 50%{opacity:0.45} }
+
+.modal-brand {
+  width: 64px; height: 64px; border-radius: 18px;
+  background: var(--grad-main);
+  display: flex; align-items: center; justify-content: center;
+  font-family:'Bebas Neue',sans-serif; font-size: 30px; color: #fff;
+  margin: 0 auto 20px;
+  box-shadow: var(--glow-indigo);
+}
+
+.modal-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size: 28px; letter-spacing: 0.08em;
+  background: var(--grad-main);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 8px;
+}
+
+.modal-sub {
+  font-size: 13px; color: var(--text-dim); margin-bottom: 28px; line-height: 1.5;
+}
+
+.visit-counter-wrap {
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.22);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+.visit-counter-wrap::before {
+  content:''; position:absolute; inset:0;
+  background: var(--grad-table); opacity:0.6;
+}
+
+.visit-loading {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  color:var(--text-dim); font-size:13px; position:relative;
+}
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.visit-number {
+  font-family:'Bebas Neue',sans-serif;
+  font-size: 56px; line-height: 1;
+  background: var(--grad-main);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  position: relative;
+  animation: countUp 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes countUp { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+
+.visit-label {
+  font-size: 12px; color: var(--text-mid); font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px;
+  position: relative;
+}
+
+.visit-dots {
+  display:flex; align-items:center; justify-content:center; gap:5px;
+  margin-top:10px; position:relative;
+}
+.visit-dot {
+  width:6px; height:6px; border-radius:50%; background:var(--indigo);
+  animation: dotBounce 1.4s ease-in-out infinite;
+}
+.visit-dot:nth-child(2){animation-delay:0.2s; background:var(--purple);}
+.visit-dot:nth-child(3){animation-delay:0.4s; background:var(--cyan);}
+@keyframes dotBounce { 0%,80%,100%{transform:scale(0.7);opacity:0.5} 40%{transform:scale(1.2);opacity:1} }
+
+.modal-continue-btn {
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 12px;
+  background: var(--grad-main);
+  border: none; color: #fff;
+  font-family:'Outfit',sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.04em;
+  transition: all 0.25s;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.35);
+  position: relative; overflow: hidden;
+}
+.modal-continue-btn::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  opacity:0; transition:opacity 0.2s;
+}
+.modal-continue-btn:hover::before { opacity:1; }
+.modal-continue-btn:hover { transform:scale(1.03); box-shadow:0 8px 32px rgba(99,102,241,0.5); }
+.modal-continue-btn:active { transform:scale(0.98); }
+
+.modal-footer-note {
+  margin-top: 14px; font-size: 11px; color: var(--text-dim); letter-spacing: 0.03em;
+}
+
+/* ═══════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════ */
 #topbar {
   position:sticky; top:0; z-index:200;
   background:rgba(2,6,23,0.88);
@@ -146,6 +293,9 @@ body::after {
 }
 .avatar:hover { transform:scale(1.08); }
 
+/* ═══════════════════════════════════════════
+   CONTENT
+═══════════════════════════════════════════ */
 #content { flex:1; padding:28px 28px 48px; max-width:1600px; margin:0 auto; width:100%; }
 
 .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
@@ -224,18 +374,15 @@ td:last-child  { padding-right:22px; }
 @keyframes rowSlideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
 @keyframes fadeUp     { from{opacity:0;transform:translateY(16px)}   to{opacity:1;transform:translateY(0)} }
 
-/* Tool icon container */
 .tool-icon-wrap {
   width:40px; height:40px; border-radius:12px;
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0;
-  ring: 1px solid rgba(255,255,255,0.08);
   box-shadow:0 4px 16px rgba(0,0,0,0.25);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 tbody tr:hover .tool-icon-wrap { transform:scale(1.08); }
 
-/* Category-specific icon themes */
 .icon-docs     { background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(59,130,246,0.2));  box-shadow:0 4px 16px rgba(99,102,241,0.2); }
 .icon-security { background:linear-gradient(135deg,rgba(239,68,68,0.22),rgba(244,63,94,0.18));   box-shadow:0 4px 16px rgba(244,63,94,0.2); }
 .icon-inquiry  { background:linear-gradient(135deg,rgba(168,85,247,0.22),rgba(139,92,246,0.18)); box-shadow:0 4px 16px rgba(168,85,247,0.2); }
@@ -266,7 +413,6 @@ tbody tr:hover .tool-icon-wrap { transform:scale(1.08); }
 }
 .cell-url a:hover { background:rgba(6,182,212,0.15); border-color:var(--cyan); box-shadow:var(--glow-cyan); }
 
-/* Category badges */
 .cat-badge {
   display:inline-flex; align-items:center; gap:5px;
   padding:4px 10px; border-radius:20px;
@@ -280,13 +426,17 @@ tbody tr:hover .tool-icon-wrap { transform:scale(1.08); }
 .badge-partner  { background:rgba(16,185,129,0.12);  color:#34d399;  border:1px solid rgba(16,185,129,0.25); }
 .badge-corp     { background:rgba(236,72,153,0.12);  color:#f472b6;  border:1px solid rgba(236,72,153,0.25); }
 
-.badge-docs     i { color:#818cf8; }
-.badge-security i { color:#f87171; }
-.badge-inquiry  i { color:#c084fc; }
-.badge-dispute  i { color:#fbbf24; }
-.badge-utility  i { color:#22d3ee; }
-.badge-partner  i { color:#34d399; }
-.badge-corp     i { color:#f472b6; }
+/* Visit badge on tool rows */
+.visit-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  background:rgba(99,102,241,0.10); border:1px solid rgba(99,102,241,0.22);
+  color:var(--indigo); border-radius:20px;
+  padding:3px 8px; font-size:10px; font-weight:700;
+  font-family:'DM Mono',monospace; white-space:nowrap;
+  transition: background 0.3s, color 0.3s;
+}
+.visit-badge.loading { color:var(--text-dim); border-color:var(--border); background:transparent; }
+.visit-badge i { width:10px; height:10px; }
 
 /* Credentials */
 .cred-wrap { display:flex; flex-direction:column; gap:5px; min-width:200px; }
@@ -308,7 +458,6 @@ tbody tr:hover .tool-icon-wrap { transform:scale(1.08); }
 .cred-copy:hover   { color:var(--indigo); }
 .no-cred { color:var(--text-dim); font-size:12px; font-style:italic; }
 
-/* Actions */
 .act-wrap { display:flex; gap:7px; }
 .act-open {
   padding:7px 14px; border-radius:7px;
@@ -399,10 +548,47 @@ footer {
 <div class="ambient amb-4"></div>
 <div id="toast-zone"></div>
 
+<!-- ═══════════════════════════════════════════
+     VISIT MODAL
+═══════════════════════════════════════════ -->
+<div id="visitOverlay">
+  <div id="visitModal">
+    <div class="modal-glow-ring"></div>
+    <div class="modal-brand">N</div>
+    <div class="modal-title">NETstar Tools Portal</div>
+    <div class="modal-sub">Internal Operations Dashboard · Welcome back</div>
+
+    <div class="visit-counter-wrap">
+      <!-- Loading state -->
+      <div class="visit-loading" id="visitLoading">
+        <svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        Fetching visit data…
+      </div>
+      <!-- Count state (hidden until loaded) -->
+      <div id="visitCountDisplay" style="display:none;">
+        <div class="visit-number" id="visitNumber">0</div>
+        <div class="visit-label">Total Portal Visits</div>
+        <div class="visit-dots">
+          <div class="visit-dot"></div>
+          <div class="visit-dot"></div>
+          <div class="visit-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="modal-continue-btn" onclick="closeVisitModal()">
+      Continue to Portal &nbsp;→
+    </button>
+    <div class="modal-footer-note">
+      <i data-lucide="lock" style="width:11px;height:11px;display:inline;vertical-align:middle;"></i>
+      &nbsp;Internal use only · NETstar Systems 2026
+    </div>
+  </div>
+</div>
+
 <div id="portal">
 
   <header id="topbar">
-    <!-- Brand -->
     <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
       <div class="brand-mark">N</div>
       <div style="line-height:1.1;">
@@ -411,7 +597,6 @@ footer {
       </div>
     </div>
 
-    <!-- Search -->
     <div class="topbar-center" style="flex:1;max-width:440px;">
       <div class="search-box">
         <span class="search-ico"><i data-lucide="search" style="width:15px;height:15px;"></i></span>
@@ -419,7 +604,6 @@ footer {
       </div>
     </div>
 
-    <!-- Right -->
     <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
       <div id="live-clock">00:00:00</div>
       <div class="status-pill">
@@ -446,7 +630,7 @@ footer {
           <div style="width:42px;height:42px;border-radius:11px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;">
             <i data-lucide="layout-grid" style="width:20px;height:20px;color:#818cf8;"></i>
           </div>
-          <div class="stat-num" style="color:var(--indigo)">18</div>
+          <div class="stat-num" style="color:var(--indigo)">19</div>
         </div>
         <div class="stat-label">Total Tools</div>
         <div class="stat-sub">Across 6 categories</div>
@@ -474,12 +658,12 @@ footer {
       <div class="stat-card d3" style="border-top:2px solid var(--emerald)">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;position:relative;">
           <div style="width:42px;height:42px;border-radius:11px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;">
-            <i data-lucide="check-circle" style="width:20px;height:20px;color:#34d399;"></i>
+            <i data-lucide="users" style="width:20px;height:20px;color:#34d399;"></i>
           </div>
-          <div class="stat-num" style="color:var(--emerald)">All</div>
+          <div class="stat-num" style="color:var(--emerald)" id="statTotalVisits">—</div>
         </div>
-        <div class="stat-label">Portal Status</div>
-        <div class="stat-sub">All endpoints reachable</div>
+        <div class="stat-label">Total Portal Visits</div>
+        <div class="stat-sub">Tracked via Firestore</div>
       </div>
     </div>
 
@@ -488,7 +672,7 @@ footer {
       <div style="display:flex;align-items:center;gap:12px;">
         <i data-lucide="book-open" style="width:20px;height:20px;color:var(--indigo);"></i>
         <span class="panel-title-text">Operations Tools Index</span>
-        <span class="pill-count" id="rowCount">16 entries</span>
+        <span class="pill-count" id="rowCount">19 entries</span>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <select class="cat-select" id="catFilter" onchange="applyFilters()">
@@ -524,6 +708,7 @@ footer {
               <th>URL</th>
               <th class="hide-mobile">Credentials</th>
               <th>Category</th>
+              <th class="hide-mobile">Visits</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -558,7 +743,157 @@ footer {
 
 <script>
 /* ═══════════════════════════════════════════════
-   DATA — lucideIcon replaces emoji/letter
+   FIREBASE INIT
+═══════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyD7Z07uquicvtPU-hONkuDvPDqpMIZrUjQ",
+  authDomain: "visit-e39e8.firebaseapp.com",
+  projectId: "visit-e39e8",
+  storageBucket: "visit-e39e8.firebasestorage.app",
+  messagingSenderId: "607230561979",
+  appId: "1:607230561979:web:91cc276277b4065385e39e",
+  measurementId: "G-2GGDN6EZZN"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* Firestore collection: "portal_visits"
+   - doc "site_total"   → { count: N }
+   - doc "tool_{id}"    → { count: N, name: "..." }
+*/
+
+/* ═══════════════════════════════════════════════
+   VISIT TRACKING — SITE
+═══════════════════════════════════════════════ */
+async function trackSiteVisitAndShowModal() {
+  try {
+    const ref = db.collection('portal_visits').doc('site_total');
+    // Atomically increment
+    await ref.set(
+      { count: firebase.firestore.FieldValue.increment(1) },
+      { merge: true }
+    );
+    const snap = await ref.get();
+    const count = snap.exists ? (snap.data().count || 1) : 1;
+    showModalCount(count);
+    // Update stat card
+    const statEl = document.getElementById('statTotalVisits');
+    if (statEl) statEl.textContent = count.toLocaleString();
+  } catch (e) {
+    console.warn('Firestore site visit error:', e);
+    showModalCount('—');
+  }
+}
+
+function showModalCount(count) {
+  const loading = document.getElementById('visitLoading');
+  const display = document.getElementById('visitCountDisplay');
+  const numEl   = document.getElementById('visitNumber');
+  if (loading) loading.style.display = 'none';
+  if (display) display.style.display = 'block';
+  if (numEl) {
+    if (typeof count === 'number') {
+      // Animate count up
+      animateCount(numEl, count);
+    } else {
+      numEl.textContent = count;
+    }
+  }
+}
+
+function animateCount(el, target) {
+  const duration = 900;
+  const start    = performance.now();
+  const from     = Math.max(0, target - Math.min(target, 30));
+  function step(now) {
+    const p = Math.min(1, (now - start) / duration);
+    const ease = 1 - Math.pow(1 - p, 3); // ease out cubic
+    el.textContent = Math.round(from + (target - from) * ease).toLocaleString();
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target.toLocaleString();
+  }
+  requestAnimationFrame(step);
+}
+
+function closeVisitModal() {
+  const overlay = document.getElementById('visitOverlay');
+  overlay.style.animation = 'overlayOut 0.35s ease forwards';
+  overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
+  // Add overlayOut keyframe dynamically
+  if (!document.getElementById('overlayOutStyle')) {
+    const s = document.createElement('style');
+    s.id = 'overlayOutStyle';
+    s.textContent = '@keyframes overlayOut { from{opacity:1} to{opacity:0;pointer-events:none} }';
+    document.head.appendChild(s);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   VISIT TRACKING — TOOLS
+═══════════════════════════════════════════════ */
+let toolVisitCounts = {}; // { toolId: count }
+
+async function loadAllToolVisits() {
+  try {
+    const snap = await db.collection('portal_visits').get();
+    snap.forEach(doc => {
+      const id = doc.id;
+      if (id.startsWith('tool_')) {
+        const toolId = parseInt(id.replace('tool_',''), 10);
+        toolVisitCounts[toolId] = doc.data().count || 0;
+      }
+    });
+    // Update any already-rendered visit badges
+    Object.keys(toolVisitCounts).forEach(tid => {
+      const badge = document.getElementById(`vbadge_${tid}`);
+      if (badge) {
+        badge.classList.remove('loading');
+        badge.innerHTML = `<i data-lucide="eye" style="width:10px;height:10px;"></i> ${Number(toolVisitCounts[tid]).toLocaleString()}`;
+        lucide.createIcons();
+      }
+    });
+    // Also clear "0" badges for tools with no record yet
+    TOOLS.forEach(t => {
+      const badge = document.getElementById(`vbadge_${t.id}`);
+      if (badge && badge.classList.contains('loading')) {
+        badge.classList.remove('loading');
+        badge.innerHTML = `<i data-lucide="eye" style="width:10px;height:10px;"></i> 0`;
+        lucide.createIcons();
+      }
+    });
+  } catch (e) {
+    console.warn('Firestore tool visits load error:', e);
+  }
+}
+
+async function trackToolVisit(toolId, toolName) {
+  try {
+    const ref = db.collection('portal_visits').doc(`tool_${toolId}`);
+    await ref.set(
+      { count: firebase.firestore.FieldValue.increment(1), name: toolName },
+      { merge: true }
+    );
+    const snap = await ref.get();
+    const newCount = snap.exists ? (snap.data().count || 1) : 1;
+    toolVisitCounts[toolId] = newCount;
+    // Update badge in table if visible
+    const badge = document.getElementById(`vbadge_${toolId}`);
+    if (badge) {
+      badge.classList.remove('loading');
+      badge.innerHTML = `<i data-lucide="eye" style="width:10px;height:10px;"></i> ${newCount.toLocaleString()}`;
+      lucide.createIcons();
+      // Pulse animation
+      badge.style.background = 'rgba(99,102,241,0.25)';
+      setTimeout(() => { badge.style.background = ''; }, 600);
+    }
+  } catch (e) {
+    console.warn('Firestore tool visit error:', e);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   TOOLS DATA
 ═══════════════════════════════════════════════ */
 const TOOLS = [
   {
@@ -580,9 +915,6 @@ const TOOLS = [
       { label:'Pass', val:'tele7222', masked:'••••••••' }
     ]
   },
-
-
-  
   {
     id:3, lucideIcon:'activity', name:'Handling Monitoring',
     sub:'Dispute Monitoring System',
@@ -623,44 +955,30 @@ const TOOLS = [
     cat:'dispute', catLabel:'Dispute', badgeClass:'badge-dispute', badgeIcon:'alert-triangle',
     creds:null
   },
-
-  //ben workflow
-{
-  id: 8, lucideIcon: 'mail', 
-  name: 'To Ben Email Notes',
-  sub: 'Email Workflow Guide',
-  desc: 'Standard operating procedure for handling emails directed to Ben or NetSTAR.',
-  url: 'https://email-to-ben.vercel.app/',
-  cat: 'corp', catLabel: 'Corporate', badgeClass: 'badge-corp', badgeIcon: 'building-2',
-  creds: null
-},
-//new added
-{
-  id: 9,
-  lucideIcon: 'file-spreadsheet',
-  name: 'CP_P2 Template Generator',
-  sub: 'Cebu Review Tool',
-  desc: 'Generate & download CP_P2 Excel template → bulk URL injection into Column A with all sheets preserved.',
-  url: 'https://p2-template-seven.vercel.app/',
-  cat: 'corp',
-  catLabel: 'Corporate',
-  badgeClass: 'badge-corp',
-  badgeIcon: 'building-2',
-  creds: []
-},
-
-{
-  id:10, lucideIcon:'file-text', name:'Partner Portal Dispute',
-  sub:'Template Generator',
-  desc:'Generate Priority 1 categorization templates for dispute types like Uncat, Changed, Retained, and Removed.',
-  url:'https://template-red-three.vercel.app/',
-  cat:'dispute', catLabel:'Dispute', badgeClass:'badge-dispute', badgeIcon:'alert-triangle',
-  creds:null
-},
-
-
-
-  
+  {
+    id:8, lucideIcon:'mail', name:'To Ben Email Notes',
+    sub:'Email Workflow Guide',
+    desc:'Standard operating procedure for handling emails directed to Ben or NetSTAR.',
+    url:'https://email-to-ben.vercel.app/',
+    cat:'corp', catLabel:'Corporate', badgeClass:'badge-corp', badgeIcon:'building-2',
+    creds:null
+  },
+  {
+    id:9, lucideIcon:'file-spreadsheet', name:'CP_P2 Template Generator',
+    sub:'Cebu Review Tool',
+    desc:'Generate & download CP_P2 Excel template → bulk URL injection into Column A with all sheets preserved.',
+    url:'https://p2-template-seven.vercel.app/',
+    cat:'corp', catLabel:'Corporate', badgeClass:'badge-corp', badgeIcon:'building-2',
+    creds:[]
+  },
+  {
+    id:10, lucideIcon:'file-text', name:'Partner Portal Dispute',
+    sub:'Template Generator',
+    desc:'Generate Priority 1 categorization templates for dispute types like Uncat, Changed, Retained, and Removed.',
+    url:'https://template-red-three.vercel.app/',
+    cat:'dispute', catLabel:'Dispute', badgeClass:'badge-dispute', badgeIcon:'alert-triangle',
+    creds:null
+  },
   {
     id:11, lucideIcon:'check-square', name:'CP P2 File Generator',
     sub:'Compliance Tool',
@@ -739,7 +1057,7 @@ let credVisible = {};
 let filterCred  = false;
 
 /* ═══════════════════════════════════════════════
-   RENDER
+   RENDER TABLE
 ═══════════════════════════════════════════════ */
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
@@ -777,8 +1095,19 @@ function renderTable(data) {
     }
 
     const urlShort = t.url.replace(/^https?:\/\//,'').replace(/\/$/,'');
+    const visitCount = toolVisitCounts[t.id] !== undefined
+      ? toolVisitCounts[t.id].toLocaleString()
+      : null;
 
-    return `<tr class="d${Math.min(i,14)}" style="animation-delay:${delay}s" onclick="openTool('${escAttr(t.url)}')" data-cat="${t.cat}">
+    const visitBadgeHTML = visitCount !== null
+      ? `<span class="visit-badge" id="vbadge_${t.id}">
+           <i data-lucide="eye" style="width:10px;height:10px;"></i> ${visitCount}
+         </span>`
+      : `<span class="visit-badge loading" id="vbadge_${t.id}">
+           <i data-lucide="loader" style="width:10px;height:10px;" class="spin"></i> …
+         </span>`;
+
+    return `<tr class="d${Math.min(i,14)}" style="animation-delay:${delay}s" onclick="openTool(${t.id},'${escAttr(t.url)}','${escAttr(t.name)}')" data-cat="${t.cat}">
       <td data-label="Icon">
         <div class="tool-icon-wrap icon-${t.cat}">
           <i data-lucide="${t.lucideIcon}" style="width:20px;height:20px;stroke-width:1.75;"></i>
@@ -789,7 +1118,7 @@ function renderTable(data) {
       </td>
       <td data-label="Desc" class="cell-desc hide-mobile">${t.desc}</td>
       <td data-label="URL" class="cell-url">
-        <a href="${t.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${t.url}">
+        <a href="${t.url}" target="_blank" rel="noopener" onclick="event.stopPropagation();trackToolVisit(${t.id},'${escAttr(t.name)}')" title="${t.url}">
           <i data-lucide="external-link" style="width:10px;height:10px;flex-shrink:0;"></i>
           ${urlShort.length > 30 ? urlShort.slice(0,30)+'…' : urlShort}
         </a>
@@ -801,9 +1130,10 @@ function renderTable(data) {
           ${t.catLabel}
         </span>
       </td>
+      <td data-label="Visits" class="hide-mobile">${visitBadgeHTML}</td>
       <td data-label="Action">
         <div class="act-wrap">
-          <button class="act-open" onclick="event.stopPropagation();openTool('${escAttr(t.url)}')">
+          <button class="act-open" onclick="event.stopPropagation();openTool(${t.id},'${escAttr(t.url)}','${escAttr(t.name)}')">
             Open
             <i data-lucide="arrow-up-right" style="width:11px;height:11px;"></i>
           </button>
@@ -819,7 +1149,7 @@ function renderTable(data) {
 }
 
 function escAttr(s) {
-  return s.replace(/'/g,"&#39;").replace(/"/g,'&quot;');
+  return String(s).replace(/'/g,"&#39;").replace(/"/g,'&quot;');
 }
 
 /* ═══════════════════════════════════════════════
@@ -864,24 +1194,25 @@ function toggleCred(toolId, ci, val, masked) {
 }
 
 /* ═══════════════════════════════════════════════
-   ACTIONS
+   OPEN TOOL — tracks visit
 ═══════════════════════════════════════════════ */
-function openTool(url) {
-  window.open(url,'_blank','noopener');
-  toast('Opening tool in new tab…','t-info');
-}
-
-function copyText(text, msg) {
-  navigator.clipboard.writeText(text).then(() => toast(msg || 'Copied!','t-success'));
+function openTool(toolId, url, toolName) {
+  window.open(url, '_blank', 'noopener');
+  toast(`Opening ${toolName}…`, 't-info');
+  trackToolVisit(toolId, toolName);
 }
 
 /* ═══════════════════════════════════════════════
-   EXPORT CSV
+   COPY / EXPORT
 ═══════════════════════════════════════════════ */
+function copyText(text, msg) {
+  navigator.clipboard.writeText(text).then(() => toast(msg || 'Copied!', 't-success'));
+}
+
 function exportCSV() {
-  const rows = [['Icon','Tool Name','Category','URL','Description']];
+  const rows = [['ID','Tool Name','Category','URL','Description','Visits']];
   TOOLS.forEach(t => {
-    rows.push([t.lucideIcon, t.name, t.catLabel, t.url, `"${t.desc}"`]);
+    rows.push([t.id, t.name, t.catLabel, t.url, `"${t.desc}"`, toolVisitCounts[t.id] || 0]);
   });
   const csv = rows.map(r=>r.join(',')).join('\n');
   const a = document.createElement('a');
@@ -889,7 +1220,7 @@ function exportCSV() {
   a.download = 'netstar-tools.csv';
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('CSV exported successfully!','t-success');
+  toast('CSV exported successfully!', 't-success');
 }
 
 /* ═══════════════════════════════════════════════
@@ -900,7 +1231,6 @@ function toast(msg, type='t-info') {
   const zone = document.getElementById('toast-zone');
   const el   = document.createElement('div');
   el.className = `toast ${type}`;
-  el.style.position = 'relative';
   el.innerHTML = `
     <span style="display:flex;align-items:center;flex-shrink:0;">
       <i data-lucide="${iconMap[type]||'info'}" style="width:18px;height:18px;color:${type==='t-success'?'#34d399':type==='t-warn'?'#fbbf24':'#818cf8'}"></i>
@@ -944,9 +1274,16 @@ updateClock();
 /* ═══════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Render table immediately (visit badges show loading state)
   renderTable(TOOLS);
   lucide.createIcons();
+
+  // Fire both in parallel: track this visit + load all tool visit counts
+  await Promise.all([
+    trackSiteVisitAndShowModal(),
+    loadAllToolVisits()
+  ]);
 });
 </script>
 </body>
