@@ -438,6 +438,27 @@ tbody tr:hover .tool-icon-wrap { transform:scale(1.08); }
 .visit-badge.loading { color:var(--text-dim); border-color:var(--border); background:transparent; }
 .visit-badge i { width:10px; height:10px; }
 
+/* Pinned-row marker (Jira docs/login always-on-top rows) */
+.pin-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3);
+  color:var(--amber); border-radius:20px;
+  padding:3px 8px; font-size:9px; font-weight:700;
+  letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap;
+  margin-left:6px;
+}
+.pin-badge i { width:9px; height:9px; }
+
+/* Top-ranked (most viewed) row marker */
+.rank-badge {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:22px; height:22px; border-radius:7px;
+  background:rgba(16,185,129,0.14); border:1px solid rgba(16,185,129,0.32);
+  color:var(--emerald); font-size:10px; font-weight:800;
+  font-family:'DM Mono',monospace; flex-shrink:0;
+}
+.rank-badge.top { background:linear-gradient(135deg,rgba(245,158,11,0.22),rgba(249,115,22,0.16)); border-color:rgba(245,158,11,0.4); color:var(--amber); }
+
 /* Credentials */
 .cred-wrap { display:flex; flex-direction:column; gap:5px; min-width:200px; }
 .cred-row {
@@ -764,6 +785,13 @@ const db = firebase.firestore();
 */
 
 /* ═══════════════════════════════════════════════
+   PINNED TOOLS — always shown first, in this exact order,
+   regardless of search/filter/visit-count sorting.
+   (Jira Ticket Docs + Jira Portal Login)
+═══════════════════════════════════════════════ */
+const PINNED_IDS = [1, 2];
+
+/* ═══════════════════════════════════════════════
    VISIT TRACKING — SITE
 ═══════════════════════════════════════════════ */
 async function trackSiteVisitAndShowModal() {
@@ -844,24 +872,8 @@ async function loadAllToolVisits() {
         toolVisitCounts[toolId] = doc.data().count || 0;
       }
     });
-    // Update any already-rendered visit badges
-    Object.keys(toolVisitCounts).forEach(tid => {
-      const badge = document.getElementById(`vbadge_${tid}`);
-      if (badge) {
-        badge.classList.remove('loading');
-        badge.innerHTML = `<i data-lucide="eye" style="width:10px;height:10px;"></i> ${Number(toolVisitCounts[tid]).toLocaleString()}`;
-        lucide.createIcons();
-      }
-    });
-    // Also clear "0" badges for tools with no record yet
-    TOOLS.forEach(t => {
-      const badge = document.getElementById(`vbadge_${t.id}`);
-      if (badge && badge.classList.contains('loading')) {
-        badge.classList.remove('loading');
-        badge.innerHTML = `<i data-lucide="eye" style="width:10px;height:10px;"></i> 0`;
-        lucide.createIcons();
-      }
-    });
+    // Re-render with fresh counts so most-viewed ordering is correct
+    applyFilters();
   } catch (e) {
     console.warn('Firestore tool visits load error:', e);
   }
@@ -877,16 +889,8 @@ async function trackToolVisit(toolId, toolName) {
     const snap = await ref.get();
     const newCount = snap.exists ? (snap.data().count || 1) : 1;
     toolVisitCounts[toolId] = newCount;
-    // Update badge in table if visible
-    const badge = document.getElementById(`vbadge_${toolId}`);
-    if (badge) {
-      badge.classList.remove('loading');
-      badge.innerHTML = `<i data-lucide="eye" style="width:10px;height:10px;"></i> ${newCount.toLocaleString()}`;
-      lucide.createIcons();
-      // Pulse animation
-      badge.style.background = 'rgba(99,102,241,0.25)';
-      setTimeout(() => { badge.style.background = ''; }, 600);
-    }
+    // Re-render so the most-viewed ordering reflects the new count immediately
+    applyFilters();
   } catch (e) {
     console.warn('Firestore tool visit error:', e);
   }
@@ -1088,11 +1092,43 @@ let credVisible = {};
 let filterCred  = false;
 
 /* ═══════════════════════════════════════════════
+   SORTING — Pinned rows first (in PINNED_IDS order),
+   then everything else ranked by visit count
+   (most-viewed first, ties keep original list order).
+═══════════════════════════════════════════════ */
+function sortByPinnedThenVisits(list) {
+  const pinned    = [];
+  const unpinned  = [];
+
+  list.forEach(t => {
+    if (PINNED_IDS.includes(t.id)) pinned.push(t);
+    else unpinned.push(t);
+  });
+
+  // Keep pinned rows in the exact PINNED_IDS order
+  pinned.sort((a, b) => PINNED_IDS.indexOf(a.id) - PINNED_IDS.indexOf(b.id));
+
+  // Rank the rest by visit count, descending. Unknown/0 counts sink to the bottom.
+  unpinned.sort((a, b) => {
+    const va = toolVisitCounts[a.id] || 0;
+    const vb = toolVisitCounts[b.id] || 0;
+    if (vb !== va) return vb - va;
+    return 0; // stable sort keeps original relative order on ties
+  });
+
+  return [...pinned, ...unpinned];
+}
+
+/* ═══════════════════════════════════════════════
    RENDER TABLE
 ═══════════════════════════════════════════════ */
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   const empty = document.getElementById('empty-state');
+
+  // Always enforce pinned-first / most-viewed-next ordering on whatever
+  // subset of tools was passed in (already filtered by search/category).
+  data = sortByPinnedThenVisits(data);
 
   if (!data.length) {
     tbody.innerHTML = '';
@@ -1104,8 +1140,18 @@ function renderTable(data) {
   empty.style.display = 'none';
   document.getElementById('rowCount').textContent = `${data.length} entr${data.length===1?'y':'ies'}`;
 
+  // Figure out the highest visit count among unpinned rows so we can
+  // crown the current "most viewed" tool with a top-rank badge.
+  const unpinnedCounts = data
+    .filter(t => !PINNED_IDS.includes(t.id))
+    .map(t => toolVisitCounts[t.id] || 0);
+  const maxUnpinnedCount = unpinnedCounts.length ? Math.max(...unpinnedCounts) : -1;
+
+  let unpinnedRank = 0;
+
   tbody.innerHTML = data.map((t, i) => {
     const delay = Math.min(i * 0.05, 0.75);
+    const isPinned = PINNED_IDS.includes(t.id);
 
     let credHTML = '<span class="no-cred">—</span>';
     if (t.creds && t.creds.length > 0) {
@@ -1138,14 +1184,31 @@ function renderTable(data) {
            <i data-lucide="loader" style="width:10px;height:10px;" class="spin"></i> …
          </span>`;
 
+    // Rank badge: shows position among most-viewed (unpinned) rows.
+    // The single most-viewed tool (and only that one, when it has >0 views) gets the "top" gold style.
+    let rankBadgeHTML = '';
+    if (!isPinned) {
+      unpinnedRank += 1;
+      const count = toolVisitCounts[t.id] || 0;
+      const isTop = count > 0 && count === maxUnpinnedCount;
+      rankBadgeHTML = `<span class="rank-badge${isTop ? ' top' : ''}" title="${isTop ? 'Most viewed tool' : 'Rank #' + unpinnedRank + ' by views'}">${isTop ? '★' : '#'+unpinnedRank}</span>`;
+    }
+
+    const pinBadgeHTML = isPinned
+      ? `<span class="pin-badge"><i data-lucide="pin" style="width:9px;height:9px;"></i>Pinned</span>`
+      : '';
+
     return `<tr class="d${Math.min(i,14)}" style="animation-delay:${delay}s" onclick="openTool(${t.id},'${escAttr(t.url)}','${escAttr(t.name)}')" data-cat="${t.cat}">
       <td data-label="Icon">
-        <div class="tool-icon-wrap icon-${t.cat}">
-          <i data-lucide="${t.lucideIcon}" style="width:20px;height:20px;stroke-width:1.75;"></i>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${rankBadgeHTML}
+          <div class="tool-icon-wrap icon-${t.cat}">
+            <i data-lucide="${t.lucideIcon}" style="width:20px;height:20px;stroke-width:1.75;"></i>
+          </div>
         </div>
       </td>
       <td data-label="Tool">
-        <div class="cell-name">${t.name}<small>${t.sub}</small></div>
+        <div class="cell-name">${t.name}${pinBadgeHTML}<small>${t.sub}</small></div>
       </td>
       <td data-label="Desc" class="cell-desc hide-mobile">${t.desc}</td>
       <td data-label="URL" class="cell-url">
@@ -1199,6 +1262,7 @@ function applyFilters() {
     const matchCred = !filterCred || (t.creds && t.creds.length > 0);
     return matchQ && matchCat && matchCred;
   });
+  // renderTable() applies pinned-first / most-viewed-next ordering internally
   renderTable(data);
 }
 
@@ -1242,7 +1306,8 @@ function copyText(text, msg) {
 
 function exportCSV() {
   const rows = [['ID','Tool Name','Category','URL','Description','Visits']];
-  TOOLS.forEach(t => {
+  // Export in the same pinned-first / most-viewed order shown on screen
+  sortByPinnedThenVisits(TOOLS).forEach(t => {
     rows.push([t.id, t.name, t.catLabel, t.url, `"${t.desc}"`, toolVisitCounts[t.id] || 0]);
   });
   const csv = rows.map(r=>r.join(',')).join('\n');
@@ -1306,7 +1371,7 @@ updateClock();
    INIT
 ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', async () => {
-  // Render table immediately (visit badges show loading state)
+  // Render table immediately (visit badges show loading state, pinned rows on top)
   renderTable(TOOLS);
   lucide.createIcons();
 
@@ -1315,6 +1380,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     trackSiteVisitAndShowModal(),
     loadAllToolVisits()
   ]);
+  // loadAllToolVisits() already re-renders via applyFilters() once counts arrive
 });
 </script>
 </body>
