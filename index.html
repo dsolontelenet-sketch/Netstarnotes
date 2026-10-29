@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -657,7 +656,7 @@ footer {
           <div style="width:42px;height:42px;border-radius:11px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;">
             <i data-lucide="layout-grid" style="width:20px;height:20px;color:#818cf8;"></i>
           </div>
-          <div class="stat-num" style="color:var(--indigo)">13</div>
+          <div class="stat-num" style="color:var(--indigo)" id="statTotalTools">19</div>
         </div>
         <div class="stat-label">Total Tools</div>
         <div class="stat-sub">Across 6 categories</div>
@@ -1074,7 +1073,25 @@ const TOOLS = [
   badgeIcon: 'wrench',
   creds: null,
   style: { color: '#22C55E' } // green color for template identity
-}
+},
+
+  /* ═══════════════════════════════════════════════
+     NEW TOOL ADDED: Immutable Dup
+  ═══════════════════════════════════════════════ */
+  {
+    id: 17,
+    lucideIcon: 'link-2', // link icon for URL/deduplication tool
+    name: 'Immutable Dup',
+    sub: 'URL Deduplication Tool',
+    desc: 'Detect and remove duplicate URLs from lists, keeping unique entries only. Fast and browser-based.',
+    url: 'https://immutabledup-rose.vercel.app/',
+    cat: 'utility',
+    catLabel: 'Utility',
+    badgeClass: 'badge-utility',
+    badgeIcon: 'wrench',
+    creds: null,
+    style: { color: '#22C55E' } // green accent for utility identity
+  }
 ];
 
 let credVisible = {};
